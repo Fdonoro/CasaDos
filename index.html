@@ -1,1 +1,3019 @@
+<!DOCTYPE html>
+<html lang="es" class="h-full bg-slate-50">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CasaDos | Calculadora financiera de compra de vivienda para parejas</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#f0f7ff',
+              100: '#e0effe',
+              500: '#0284c7',
+              600: '#0369a1',
+              700: '#075985',
+            },
+            p1: {
+              50: '#eff6ff',
+              100: '#dbeafe',
+              200: '#bfdbfe',
+              500: '#3b82f6',
+              600: '#2563eb',
+              700: '#1d4ed8',
+              800: '#1e40af'
+            },
+            p2: {
+              50: '#fdf4ff',
+              100: '#fae8ff',
+              200: '#f5d0fe',
+              500: '#d946ef',
+              600: '#c026d3',
+              700: '#a21caf',
+              800: '#86198f'
+            }
+          },
+          fontFamily: {
+            sans: ['Inter', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    /* Estilos personalizados para sliders e inputs numéricos */
+    input[type=number]::-webkit-inner-spin-button, 
+    input[type=number]::-webkit-outer-spin-button { 
+      -webkit-appearance: none; 
+      margin: 0; 
+    }
+    input[type=number] {
+      -moz-appearance: textfield;
+    }
+    .custom-scrollbar::-webkit-scrollbar {
+      height: 8px;
+      width: 8px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-track {
+      background: #f1f5f9;
+      border-radius: 4px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 4px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+      background: #94a3b8;
+    }
+    @keyframes pulse-subtle {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.85; }
+    }
+    .badge-pulse {
+      animation: pulse-subtle 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    }
 
+    /* Estilos para impresión y generación de PDF */
+    @media print {
+      body {
+        background: #ffffff !important;
+        color: #0f172a !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+      }
+      /* Ocultar la aplicación general durante la impresión del resumen */
+      body > *:not(#summaryModal) {
+        display: none !important;
+      }
+      #summaryModal {
+        position: static !important;
+        display: block !important;
+        background: transparent !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        max-width: 100% !important;
+        box-shadow: none !important;
+        z-index: 1 !important;
+      }
+      #summaryModalHeader, #summaryModalFooterActions {
+        display: none !important;
+      }
+      #summaryModalDialog {
+        max-width: 100% !important;
+        width: 100% !important;
+        box-shadow: none !important;
+        border: none !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        background: transparent !important;
+        height: auto !important;
+        max-height: none !important;
+        overflow: visible !important;
+      }
+      #summaryReportContent {
+        display: block !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        font-size: 10pt !important;
+        border: none !important;
+        box-shadow: none !important;
+      }
+      .page-break-inside-avoid {
+        break-inside: avoid;
+        page-break-inside: avoid;
+      }
+      @page {
+        size: A4;
+        margin: 10mm;
+      }
+    }
+  </style>
+  <!-- html2pdf.js para descarga directa de PDF sin dependencias de servidor -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+</head>
+<body class="min-h-full flex flex-col text-slate-800 antialiased selection:bg-brand-500 selection:text-white">
+
+  <!-- TOP NAVIGATION BAR -->
+  <header class="sticky top-0 z-30 bg-white/95 backdrop-blur border-b border-slate-200 shadow-xs">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-16">
+        <!-- Logo & Title -->
+        <div class="flex items-center space-x-3">
+          <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-sky-600 via-indigo-600 to-fuchsia-600 flex items-center justify-center text-white shadow-md shadow-indigo-100">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+            </svg>
+          </div>
+          <div>
+            <h1 class="text-base sm:text-lg font-extrabold text-slate-900 tracking-tight flex items-center gap-2">
+              CasaDos
+            </h1>
+            <p class="text-xs text-slate-500 font-medium hidden sm:block">Calculadora financiera de compra de vivienda para parejas</p>
+          </div>
+        </div>
+
+        <!-- Acciones: Resumen PDF, Guardar & Comparar -->
+        <div class="flex items-center space-x-2 sm:space-x-3">
+          <!-- Botón Resumen & PDF -->
+          <button id="btnOpenSummaryModal" class="inline-flex items-center gap-1.5 px-3 py-2 text-xs sm:text-sm font-bold rounded-lg text-emerald-800 bg-emerald-50 hover:bg-emerald-100 border border-emerald-300 transition-colors shadow-xs">
+            <svg class="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+            </svg>
+            <span class="hidden sm:inline">Descargar</span>
+            <span>Resumen PDF</span>
+          </button>
+
+          <!-- Botón Guardar Simulación Actual -->
+          <button id="btnOpenSaveModal" class="inline-flex items-center gap-1.5 px-3 py-2 text-xs sm:text-sm font-medium rounded-lg text-slate-700 bg-slate-100 hover:bg-slate-200 transition-colors shadow-xs">
+            <svg class="w-4 h-4 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"/>
+            </svg>
+            <span class="hidden sm:inline">Guardar simulación</span>
+            <span class="sm:hidden">Guardar</span>
+          </button>
+
+          <!-- Botón Comparador con Badge de Conteo -->
+          <button id="btnOpenCompareModal" class="relative inline-flex items-center gap-1.5 px-3.5 py-2 text-xs sm:text-sm font-semibold rounded-lg text-white bg-indigo-600 hover:bg-indigo-700 transition-all shadow-sm hover:shadow">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+            </svg>
+            <span class="hidden sm:inline">Comparar casas</span>
+            <span class="sm:hidden">Comparar</span>
+            <span id="savedCountBadge" class="ml-1 px-1.5 py-0.2 bg-white text-indigo-700 rounded-full text-xs font-bold">0</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- BANNER RESUMEN PRINCIPAL (KPI BAR) -->
+  <section class="bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white py-5 px-4 shadow-inner border-b border-indigo-900/50">
+    <div class="max-w-7xl mx-auto grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+      
+      <!-- Coste Total Operación -->
+      <div class="bg-white/10 backdrop-blur-xs rounded-xl p-3 border border-white/10">
+        <span class="text-xs text-slate-300 font-medium block">Coste Total Operación</span>
+        <div class="text-xl sm:text-2xl font-black text-white mt-1" id="kpiTotalCost">0 €</div>
+        <span class="text-[11px] text-slate-400" id="kpiHouseTypeSubtitle">Vivienda + Impuestos + Gastos</span>
+      </div>
+
+      <!-- Fondos Propios / Entrada Aportada -->
+      <div class="bg-white/10 backdrop-blur-xs rounded-xl p-3 border border-white/10">
+        <span class="text-xs text-slate-300 font-medium block">Aportación Pareja (Entrada)</span>
+        <div class="text-xl sm:text-2xl font-black text-emerald-300 mt-1" id="kpiTotalDownpayment">0 €</div>
+        <span class="text-[11px] text-emerald-400/80" id="kpiDownpaymentPercent">0% del coste total</span>
+      </div>
+
+      <!-- Hipoteca Total Necesaria -->
+      <div class="bg-white/10 backdrop-blur-xs rounded-xl p-3 border border-white/10">
+        <span class="text-xs text-slate-300 font-medium block">Hipoteca Total Necesaria</span>
+        <div class="text-xl sm:text-2xl font-black text-sky-300 mt-1" id="kpiMortgageTotal">0 €</div>
+        <span class="text-[11px] text-sky-300/80" id="kpiMortgagePercent">0% sobre precio</span>
+      </div>
+
+      <!-- Cuota Mensual Pareja -->
+      <div class="bg-white/10 backdrop-blur-xs rounded-xl p-3 border border-white/10">
+        <span class="text-xs text-slate-300 font-medium block">Cuota Mensual Pareja</span>
+        <div class="text-xl sm:text-2xl font-black text-amber-300 mt-1" id="kpiMonthlyPayment">0 € /mes</div>
+        <span class="text-[11px] text-slate-300" id="kpiInterestRateSubtitle">TIN 2.8% a 30 años</span>
+      </div>
+
+      <!-- Tasa de Esfuerzo Conjunta -->
+      <div class="bg-white/10 backdrop-blur-xs rounded-xl p-3 border border-white/10">
+        <span class="text-xs text-slate-300 font-medium block">Esfuerzo Financiero Conjunto</span>
+        <div class="flex items-center gap-1.5 mt-1">
+          <span class="text-xl sm:text-2xl font-black" id="kpiEffortTotal">0%</span>
+          <span id="kpiEffortBadge" class="text-[10px] uppercase font-bold px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">Saludable</span>
+        </div>
+        <span class="text-[11px] text-slate-400">Recomendado &lt; 30-35%</span>
+      </div>
+
+      <!-- Sobrante Mensual Pareja -->
+      <div class="bg-white/10 backdrop-blur-xs rounded-xl p-3 border border-white/10 col-span-2 sm:col-span-1">
+        <span class="text-xs text-slate-300 font-medium block">Dinero Libre Mensual Total</span>
+        <div class="text-xl sm:text-2xl font-black text-teal-300 mt-1" id="kpiFreeCashTotal">0 €</div>
+        <span class="text-[11px] text-slate-400">Tras cuota y gastos básicos</span>
+      </div>
+
+    </div>
+
+    <!-- Barra de estado de cuadre financiero -->
+    <div id="financialBalanceAlert" class="max-w-7xl mx-auto mt-3 px-3 py-2 rounded-lg text-xs flex items-center justify-between transition-all bg-emerald-950/60 border border-emerald-500/40 text-emerald-200">
+      <div class="flex items-center gap-2">
+        <span id="balanceIcon" class="w-4 h-4 text-emerald-400">✓</span>
+        <span id="balanceText"><strong>Plan financiero cuadrado:</strong> Las aportaciones de la pareja más la hipoteca cubren exactamente el 100% de la operación.</span>
+      </div>
+      <button id="btnAutoBalance" class="hidden underline font-bold hover:text-white px-2 py-0.5 rounded bg-white/10 transition-colors">
+        Ajustar hipoteca automáticamente
+      </button>
+    </div>
+  </section>
+
+  <!-- CONTENEDOR PRINCIPAL -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-1 w-full space-y-8">
+
+    <!-- SECCIÓN 1: DATOS DE LA VIVIENDA Y TRIBUTOS -->
+    <section class="bg-white rounded-2xl shadow-xs border border-slate-200 p-6 md:p-8">
+      <div class="flex items-center justify-between pb-5 border-b border-slate-100">
+        <div class="flex items-center gap-3">
+          <div class="w-9 h-9 rounded-lg bg-sky-100 text-sky-700 flex items-center justify-center font-bold">1</div>
+          <div>
+            <h2 class="text-lg font-bold text-slate-900">Datos de la Vivienda y Tributos</h2>
+            <p class="text-xs text-slate-500">Precio base, impuestos asociados, reformas y gastos de gestión</p>
+          </div>
+        </div>
+        <span class="text-xs font-semibold px-2.5 py-1 bg-slate-100 text-slate-600 rounded-md">Paso 1 de 5</span>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
+        
+        <!-- Precio de la vivienda SIN IVA -->
+        <div class="space-y-1.5">
+          <label for="housePrice" class="block text-xs font-semibold text-slate-700 uppercase tracking-wider">
+            Precio de la vivienda (SIN IVA / ITP)
+          </label>
+          <div class="relative rounded-xl shadow-xs">
+            <input type="number" id="housePrice" min="0" step="1000" value="250000"
+              class="w-full pl-3 pr-10 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 font-semibold focus:bg-white focus:ring-2 focus:ring-sky-500 focus:border-sky-500 text-base transition-all">
+            <span class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-slate-400 font-medium">€</span>
+          </div>
+          <p class="text-[11px] text-slate-400">Importe acordado de compraventa con el vendedor.</p>
+        </div>
+
+        <!-- Selector Tipo de Vivienda -->
+        <div class="space-y-1.5">
+          <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider">
+            Tipo de Vivienda
+          </label>
+          <div class="grid grid-cols-2 gap-2 bg-slate-100 p-1 rounded-xl border border-slate-200">
+            <button type="button" id="btnTypeNew" class="py-2 px-3 text-xs font-bold rounded-lg transition-all text-slate-600 hover:text-slate-900">
+              Obra Nueva (10% IVA)
+            </button>
+            <button type="button" id="btnTypeUsed" class="py-2 px-3 text-xs font-bold rounded-lg transition-all bg-white text-indigo-700 shadow-xs border border-slate-200">
+              Seminueva (6% ITP)
+            </button>
+          </div>
+          <p class="text-[11px] text-slate-400" id="typeTaxDescription">Aplica 6% ITP por defecto (ajustable manualmente).</p>
+        </div>
+
+        <!-- Impuesto Calculado pero Editable (IVA o ITP) -->
+        <div class="space-y-1.5">
+          <div class="flex items-center justify-between">
+            <label for="taxAmount" id="taxLabel" class="block text-xs font-semibold text-slate-700 uppercase tracking-wider">
+              Impuesto ITP (6%)
+            </label>
+            <button type="button" id="btnResetTax" class="text-[11px] text-sky-600 hover:underline">Recalcular default</button>
+          </div>
+          <div class="relative rounded-xl shadow-xs">
+            <input type="number" id="taxAmount" min="0" step="100" value="15000"
+              class="w-full pl-3 pr-10 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 font-semibold focus:bg-white focus:ring-2 focus:ring-sky-500 focus:border-sky-500 text-base transition-all">
+            <span class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-slate-400 font-medium">€</span>
+          </div>
+          <p class="text-[11px] text-slate-400" id="taxHelperText">10% IVA en nueva o 6% ITP en usada (editable según CC.AA.).</p>
+        </div>
+
+        <!-- Gastos de Reforma Estimados (Condicional si es Seminueva) -->
+        <div id="reformsContainer" class="space-y-1.5">
+          <label for="renovationCosts" class="block text-xs font-semibold text-indigo-700 uppercase tracking-wider flex items-center justify-between">
+            <span>Gastos de Reforma Estimados</span>
+            <span class="text-[10px] font-medium text-indigo-500 bg-indigo-50 px-1.5 py-0.5 rounded">Seminueva</span>
+          </label>
+          <div class="relative rounded-xl shadow-xs">
+            <input type="number" id="renovationCosts" min="0" step="500" value="50000"
+              class="w-full pl-3 pr-10 py-2.5 bg-indigo-50/40 border border-indigo-200 rounded-xl text-indigo-950 font-semibold focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-base transition-all">
+            <span class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-indigo-400 font-medium">€</span>
+          </div>
+          <p class="text-[11px] text-slate-400">Presupuesto previsto para obras, cocina, baños o fontanería.</p>
+        </div>
+
+        <!-- Gastos de Compraventa (Notaría, Registro, Gestoría, Tasación) -->
+        <div class="space-y-1.5">
+          <label for="closingCosts" class="block text-xs font-semibold text-slate-700 uppercase tracking-wider">
+            Gastos Compraventa (Notaría, Registro, Tasación)
+          </label>
+          <div class="relative rounded-xl shadow-xs">
+            <input type="number" id="closingCosts" min="0" step="100" value="3200"
+              class="w-full pl-3 pr-10 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 font-semibold focus:bg-white focus:ring-2 focus:ring-sky-500 focus:border-sky-500 text-base transition-all">
+            <span class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-slate-400 font-medium">€</span>
+          </div>
+          <p class="text-[11px] text-slate-400">Aranceles notariales, tasación homologada y registro de la propiedad.</p>
+        </div>
+
+        <!-- Comisión de Agencia / Vendedor (%) -->
+        <div class="space-y-1.5">
+          <div class="flex items-center justify-between">
+            <label for="agencyFeePercent" class="block text-xs font-semibold text-slate-700 uppercase tracking-wider">
+              Comisión Agencia / Vendedor
+            </label>
+            <span id="agencyAmountDisplay" class="text-xs font-bold text-slate-600">7.500 €</span>
+          </div>
+          <div class="relative rounded-xl shadow-xs">
+            <input type="number" id="agencyFeePercent" min="0" max="20" step="0.5" value="3"
+              class="w-full pl-3 pr-10 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 font-semibold focus:bg-white focus:ring-2 focus:ring-sky-500 focus:border-sky-500 text-base transition-all">
+            <span class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-slate-400 font-medium">%</span>
+          </div>
+          <p class="text-[11px] text-slate-400">Por defecto 3% en seminuevas y 0% en obra nueva (totalmente editable).</p>
+        </div>
+
+        <!-- Gastos de Comunidad Mensuales -->
+        <div class="space-y-1.5">
+          <div class="flex items-center justify-between">
+            <label for="communityFee" class="block text-xs font-semibold text-slate-700 uppercase tracking-wider">
+              Gastos de Comunidad
+            </label>
+            <span id="communityAnnualDisplay" class="text-xs font-bold text-amber-700">0 €/año</span>
+          </div>
+          <div class="relative rounded-xl shadow-xs">
+            <input type="number" id="communityFee" min="0" step="5" value="0" placeholder="0"
+              class="w-full pl-3 pr-16 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 font-semibold focus:bg-white focus:ring-2 focus:ring-sky-500 focus:border-sky-500 text-base transition-all">
+            <span class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-slate-400 font-medium text-xs">€ / mes</span>
+          </div>
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-1 text-[11px] text-slate-400">
+            <span>Cuota mensual (indicar 0 € si no tiene comunidad).</span>
+            <span class="inline-flex items-center gap-1 font-semibold text-amber-800 bg-amber-50 px-2 py-0.5 rounded border border-amber-200/60 self-start sm:self-auto">
+              <span>Nota:</span> <strong id="community30YearsDisplay">0 €</strong> en 30 años
+            </span>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Resumen Desglosado Sección 1 -->
+      <div class="mt-6 pt-4 border-t border-slate-100 bg-slate-50/70 -mx-6 md:-mx-8 -mb-6 md:-mb-8 p-6 md:p-8 rounded-b-2xl">
+        <div class="grid grid-cols-2 sm:grid-cols-5 gap-4 text-xs">
+          <div>
+            <span class="text-slate-500">Precio Inmueble:</span>
+            <div class="font-bold text-slate-800 text-sm mt-0.5" id="sumPrice">250.000 €</div>
+          </div>
+          <div>
+            <span class="text-slate-500">Impuestos + Gastos + Agencia:</span>
+            <div class="font-bold text-slate-800 text-sm mt-0.5" id="sumTaxesAndFees">25.700 €</div>
+          </div>
+          <div>
+            <span class="text-slate-500">Reforma Estimada:</span>
+            <div class="font-bold text-indigo-700 text-sm mt-0.5" id="sumRenovation">50.000 €</div>
+          </div>
+          <div>
+            <span class="text-slate-500">Comunidad:</span>
+            <div class="font-bold text-amber-700 text-sm mt-0.5" id="sumCommunityDisplay">0 €/mes</div>
+          </div>
+          <div>
+            <span class="text-slate-500 font-semibold">Total Operación Compra:</span>
+            <div class="font-extrabold text-sky-700 text-base mt-0.5" id="sumTotalOperation">325.700 €</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECCIÓN 2: APORTACIONES DE LA PAREJA (P1 & P2) -->
+    <section class="bg-white rounded-2xl shadow-xs border border-slate-200 p-6 md:p-8">
+      <div class="flex items-center justify-between pb-5 border-b border-slate-100">
+        <div class="flex items-center gap-3">
+          <div class="w-9 h-9 rounded-lg bg-indigo-100 text-indigo-700 flex items-center justify-center font-bold">2</div>
+          <div>
+            <h2 class="text-lg font-bold text-slate-900">Aportaciones Iniciales de la Pareja</h2>
+            <p class="text-xs text-slate-500">Fondos propios aportados para la entrada y gastos por cada miembro</p>
+          </div>
+        </div>
+        <span class="text-xs font-semibold px-2.5 py-1 bg-slate-100 text-slate-600 rounded-md">Paso 2 de 5</span>
+      </div>
+
+      <!-- Comparativa Visual P1 vs P2 -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+        
+        <!-- TARJETA PERSONA 1 -->
+        <div class="bg-gradient-to-b from-blue-50/60 to-white rounded-2xl border-2 border-blue-200/80 p-5 space-y-4 shadow-xs">
+          <div class="flex items-center justify-between pb-3 border-b border-blue-100 gap-2">
+            <div class="flex items-center gap-2 flex-1 min-w-0">
+              <span class="w-3 h-3 rounded-full bg-blue-500 shrink-0"></span>
+              <div class="relative flex items-center flex-1 max-w-[200px]">
+                <input type="text" id="p1Name" value="Persona 1" maxlength="20" placeholder="Nombre Persona 1"
+                  class="w-full font-bold text-blue-900 text-base bg-transparent hover:bg-blue-100/60 focus:bg-white border border-transparent hover:border-blue-300 focus:border-blue-500 rounded-lg px-2 py-0.5 transition-all outline-hidden cursor-pointer focus:cursor-text"
+                  title="Haz clic para personalizar el nombre">
+                <svg class="w-3.5 h-3.5 text-blue-400 pointer-events-none absolute right-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/>
+                </svg>
+              </div>
+            </div>
+            <span class="text-xs font-semibold text-blue-700 bg-blue-100 px-2 py-0.5 rounded-full shrink-0" id="p1TotalAportacionBadge">Aporta: 0 €</span>
+          </div>
+
+          <!-- Entrada Ahorros P1 -->
+          <div class="space-y-1.5">
+            <label for="p1Savings" class="block text-xs font-semibold text-slate-700">
+              Aportación de ahorros para la entrada
+            </label>
+            <div class="relative rounded-xl">
+              <input type="number" id="p1Savings" min="0" step="500" value="35000"
+                class="w-full pl-3 pr-10 py-2.5 bg-white border border-blue-200 rounded-xl text-slate-900 font-semibold focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-base transition-all">
+              <span class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-slate-400 font-medium">€</span>
+            </div>
+            <p class="text-[11px] text-slate-400">Ahorros líquidos que destina directamente a la compra.</p>
+          </div>
+
+          <!-- Donaciones o Ayudas Extra P1 -->
+          <div class="space-y-1.5">
+            <label for="p1Donations" class="block text-xs font-semibold text-slate-700">
+              Aportación por donaciones o ayudas extra
+            </label>
+            <div class="relative rounded-xl">
+              <input type="number" id="p1Donations" min="0" step="500" value="0"
+                class="w-full pl-3 pr-10 py-2.5 bg-white border border-blue-200 rounded-xl text-slate-900 font-semibold focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-base transition-all">
+              <span class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-slate-400 font-medium">€</span>
+            </div>
+            <p class="text-[11px] text-slate-400">Ayuda familiar, herencias anticipadas o subvenciones personales.</p>
+          </div>
+
+          <!-- Subtotal P1 -->
+          <div class="pt-3 border-t border-blue-100 flex items-center justify-between text-xs text-blue-900 font-medium">
+            <span>Total Fondos Iniciales P1:</span>
+            <span class="font-bold text-sm text-blue-700" id="p1InitialFunds">35.000 €</span>
+          </div>
+        </div>
+
+        <!-- TARJETA PERSONA 2 -->
+        <div class="bg-gradient-to-b from-fuchsia-50/60 to-white rounded-2xl border-2 border-fuchsia-200/80 p-5 space-y-4 shadow-xs">
+          <div class="flex items-center justify-between pb-3 border-b border-fuchsia-100 gap-2">
+            <div class="flex items-center gap-2 flex-1 min-w-0">
+              <span class="w-3 h-3 rounded-full bg-fuchsia-500 shrink-0"></span>
+              <div class="relative flex items-center flex-1 max-w-[200px]">
+                <input type="text" id="p2Name" value="Persona 2" maxlength="20" placeholder="Nombre Persona 2"
+                  class="w-full font-bold text-fuchsia-900 text-base bg-transparent hover:bg-fuchsia-100/60 focus:bg-white border border-transparent hover:border-fuchsia-300 focus:border-fuchsia-500 rounded-lg px-2 py-0.5 transition-all outline-hidden cursor-pointer focus:cursor-text"
+                  title="Haz clic para personalizar el nombre">
+                <svg class="w-3.5 h-3.5 text-fuchsia-400 pointer-events-none absolute right-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/>
+                </svg>
+              </div>
+            </div>
+            <span class="text-xs font-semibold text-fuchsia-700 bg-fuchsia-100 px-2 py-0.5 rounded-full shrink-0" id="p2TotalAportacionBadge">Aporta: 0 €</span>
+          </div>
+
+          <!-- Entrada Ahorros P2 -->
+          <div class="space-y-1.5">
+            <label for="p2Savings" class="block text-xs font-semibold text-slate-700">
+              Aportación de ahorros para la entrada
+            </label>
+            <div class="relative rounded-xl">
+              <input type="number" id="p2Savings" min="0" step="500" value="35000"
+                class="w-full pl-3 pr-10 py-2.5 bg-white border border-fuchsia-200 rounded-xl text-slate-900 font-semibold focus:ring-2 focus:ring-fuchsia-500 focus:border-fuchsia-500 text-base transition-all">
+              <span class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-slate-400 font-medium">€</span>
+            </div>
+            <p class="text-[11px] text-slate-400">Ahorros líquidos que destina directamente a la compra.</p>
+          </div>
+
+          <!-- Donaciones o Ayudas Extra P2 -->
+          <div class="space-y-1.5">
+            <label for="p2Donations" class="block text-xs font-semibold text-slate-700">
+              Aportación por donaciones o ayudas extra
+            </label>
+            <div class="relative rounded-xl">
+              <input type="number" id="p2Donations" min="0" step="500" value="0"
+                class="w-full pl-3 pr-10 py-2.5 bg-white border border-fuchsia-200 rounded-xl text-slate-900 font-semibold focus:ring-2 focus:ring-fuchsia-500 focus:border-fuchsia-500 text-base transition-all">
+              <span class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-slate-400 font-medium">€</span>
+            </div>
+            <p class="text-[11px] text-slate-400">Ayuda familiar, herencias anticipadas o subvenciones personales.</p>
+          </div>
+
+          <!-- Subtotal P2 -->
+          <div class="pt-3 border-t border-fuchsia-100 flex items-center justify-between text-xs text-fuchsia-900 font-medium">
+            <span>Total Fondos Iniciales P2:</span>
+            <span class="font-bold text-sm text-fuchsia-700" id="p2InitialFunds">35.000 €</span>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Resumen Conjunto de Entrada -->
+      <div class="mt-6 p-4 rounded-xl bg-slate-50 border border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+        <div>
+          <span class="text-slate-500 font-medium">Total Entrada Aportada por la Pareja:</span>
+          <span class="text-base font-extrabold text-slate-900 ml-2" id="sumBothDownpayment">70.000 €</span>
+          <span class="text-slate-400 ml-1" id="sumBothDownpaymentPercent">(22% de la operación)</span>
+        </div>
+        <div class="flex items-center gap-3">
+          <span class="text-slate-500 font-medium">Hipoteca total necesaria:</span>
+          <span class="text-sm font-bold text-sky-700 bg-sky-50 px-2.5 py-1 rounded-lg border border-sky-200" id="theoreticalRemainingMortgage">255.700 €</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECCIÓN 3: CONDICIONES DE LA HIPOTECA -->
+    <section class="bg-white rounded-2xl shadow-xs border border-slate-200 p-6 md:p-8">
+      <div class="flex items-center justify-between pb-5 border-b border-slate-100">
+        <div class="flex items-center gap-3">
+          <div class="w-9 h-9 rounded-lg bg-emerald-100 text-emerald-700 flex items-center justify-center font-bold">3</div>
+          <div>
+            <h2 class="text-lg font-bold text-slate-900">Condiciones de la Hipoteca</h2>
+            <p class="text-xs text-slate-500">Reparto del préstamo, tipo de interés fijo y cálculo de cuota mensual</p>
+          </div>
+        </div>
+        <span class="text-xs font-semibold px-2.5 py-1 bg-slate-100 text-slate-600 rounded-md">Paso 3 de 5</span>
+      </div>
+
+      <!-- Parámetros Generales del Préstamo -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
+        
+        <!-- Tipo de Interés Fijo -->
+        <div class="space-y-1.5">
+          <label for="interestRate" class="block text-xs font-semibold text-slate-700 uppercase tracking-wider">
+            Tipo de Interés Fijo (TIN)
+          </label>
+          <div class="relative rounded-xl shadow-xs">
+            <input type="number" id="interestRate" min="0.1" max="15" step="0.05" value="2.8"
+              class="w-full pl-3 pr-10 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 font-semibold focus:bg-white focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 text-base transition-all">
+            <span class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-slate-400 font-medium">%</span>
+          </div>
+          <p class="text-[11px] text-slate-400">Por defecto 2.8% fijo. Ajusta según oferta bancaria.</p>
+        </div>
+
+        <!-- Plazo en Años -->
+        <div class="space-y-1.5">
+          <label for="mortgageYears" class="block text-xs font-semibold text-slate-700 uppercase tracking-wider">
+            Plazo de amortización
+          </label>
+          <div class="relative rounded-xl shadow-xs">
+            <input type="number" id="mortgageYears" min="5" max="40" step="1" value="30"
+              class="w-full pl-3 pr-14 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 font-semibold focus:bg-white focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 text-base transition-all">
+            <span class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-slate-400 font-medium">años</span>
+          </div>
+          <div class="flex justify-between text-[11px] text-slate-400">
+            <span>Cuotas totales: <strong id="totalInstallmentsText" class="text-slate-600">360</strong> meses</span>
+            <div class="space-x-1">
+              <button type="button" class="text-emerald-700 font-semibold hover:underline" onclick="setYears(20)">20</button>
+              <button type="button" class="text-emerald-700 font-semibold hover:underline" onclick="setYears(25)">25</button>
+              <button type="button" class="text-emerald-700 font-semibold hover:underline" onclick="setYears(30)">30</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Casilla Hipoteca Total Necesaria (Automática) -->
+        <div class="space-y-1.5 sm:col-span-2 lg:col-span-1">
+          <div class="flex items-center justify-between">
+            <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
+              <span>Hipoteca Total Necesaria</span>
+              <span class="text-[10px] font-bold text-sky-700 bg-sky-100 px-1.5 py-0.5 rounded border border-sky-200">100% Automática</span>
+            </label>
+            <button type="button" id="btnSplitMortgage5050" class="text-[11px] text-indigo-600 font-bold hover:underline">Repartir 50% / 50%</button>
+          </div>
+          <div class="relative rounded-xl shadow-xs">
+            <input type="text" id="mortgageTotalCombined" readonly
+              class="w-full pl-3 pr-10 py-2.5 bg-sky-50/80 border-2 border-sky-300 rounded-xl text-sky-950 font-black text-lg cursor-not-allowed">
+            <span class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-sky-600 font-bold text-base">€</span>
+          </div>
+          <p class="text-[11px] text-slate-400">Calculada automáticamente: Coste Total menos Aportaciones de la pareja.</p>
+        </div>
+
+      </div>
+
+      <!-- Control de Reparto Interactivo de la Hipoteca -->
+      <div class="mt-6 p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-2.5">
+        <div class="flex items-center justify-between text-xs">
+          <span class="font-bold text-blue-700 flex items-center gap-1.5">
+            <span class="w-2.5 h-2.5 rounded-full bg-blue-500"></span> <span class="name-display-p1">Persona 1</span>: <span id="sliderP1Pct">50%</span>
+          </span>
+          <span class="text-slate-500 text-[11px] font-medium hidden sm:inline">Desliza o escribe directamente abajo; el otro se ajusta al instante</span>
+          <span class="font-bold text-fuchsia-700 flex items-center gap-1.5">
+            <span class="name-display-p2">Persona 2</span>: <span id="sliderP2Pct">50%</span> <span class="w-2.5 h-2.5 rounded-full bg-fuchsia-500"></span>
+          </span>
+        </div>
+        <input type="range" id="mortgageSplitSlider" min="0" max="100" step="1" value="50"
+          class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-indigo-600">
+        <div class="flex flex-wrap items-center justify-between gap-2 pt-1 text-[11px]">
+          <span class="text-slate-400 text-[10px]">Accesos rápidos de reparto:</span>
+          <div class="flex items-center gap-1.5">
+            <button type="button" class="px-2 py-0.5 rounded-md bg-white border border-slate-200 text-slate-700 hover:bg-slate-100 font-semibold shadow-2xs" onclick="setMortgageSplit(50)">50% / 50%</button>
+            <button type="button" class="px-2 py-0.5 rounded-md bg-white border border-slate-200 text-slate-700 hover:bg-slate-100 font-semibold shadow-2xs" onclick="setMortgageSplit(60)">60% / 40%</button>
+            <button type="button" class="px-2 py-0.5 rounded-md bg-white border border-slate-200 text-slate-700 hover:bg-slate-100 font-semibold shadow-2xs" onclick="setMortgageSplit(70)">70% / 30%</button>
+            <button type="button" class="px-2 py-0.5 rounded-md bg-white border border-slate-200 text-slate-700 hover:bg-slate-100 font-semibold shadow-2xs" onclick="setMortgageSplit(100)">100% <span class="name-display-p1">P1</span></button>
+            <button type="button" class="px-2 py-0.5 rounded-md bg-white border border-slate-200 text-slate-700 hover:bg-slate-100 font-semibold shadow-2xs" onclick="setMortgageSplit(0)">100% <span class="name-display-p2">P2</span></button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Asignación Individual de Hipoteca (P1 y P2) -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
+        
+        <!-- Hipoteca Persona 1 -->
+        <div class="p-4 rounded-xl bg-blue-50/50 border border-blue-200 space-y-2">
+          <div class="flex items-center justify-between">
+            <label for="p1Mortgage" class="text-xs font-bold text-blue-900 uppercase">
+              Hipoteca asumida por <span class="name-display-p1">Persona 1</span>
+            </label>
+            <span class="text-xs font-semibold text-blue-700 bg-blue-100 px-2 py-0.5 rounded" id="p1MortgageSharePct">50.0%</span>
+          </div>
+          <div class="relative rounded-xl shadow-xs">
+            <input type="number" id="p1Mortgage" min="0" step="500" value="127850"
+              class="w-full pl-3 pr-10 py-2.5 bg-white border border-blue-300 rounded-xl text-slate-900 font-bold text-base focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all">
+            <span class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-slate-400 font-medium">€</span>
+          </div>
+          <p class="text-[11px] text-slate-500 flex items-center justify-between">
+            <span>Si modificas este importe, <span class="name-display-p2">Persona 2</span> asume el restante.</span>
+          </p>
+        </div>
+
+        <!-- Hipoteca Persona 2 -->
+        <div class="p-4 rounded-xl bg-fuchsia-50/50 border border-fuchsia-200 space-y-2">
+          <div class="flex items-center justify-between">
+            <label for="p2Mortgage" class="text-xs font-bold text-fuchsia-900 uppercase">
+              Hipoteca asumida por <span class="name-display-p2">Persona 2</span>
+            </label>
+            <span class="text-xs font-semibold text-fuchsia-700 bg-fuchsia-100 px-2 py-0.5 rounded" id="p2MortgageSharePct">50.0%</span>
+          </div>
+          <div class="relative rounded-xl shadow-xs">
+            <input type="number" id="p2Mortgage" min="0" step="500" value="127850"
+              class="w-full pl-3 pr-10 py-2.5 bg-white border border-fuchsia-300 rounded-xl text-slate-900 font-bold text-base focus:ring-2 focus:ring-fuchsia-500 focus:border-fuchsia-500 transition-all">
+            <span class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-slate-400 font-medium">€</span>
+          </div>
+          <p class="text-[11px] text-slate-500 flex items-center justify-between">
+            <span>Si modificas este importe, <span class="name-display-p1">Persona 1</span> asume el restante.</span>
+          </p>
+        </div>
+
+      </div>
+
+      <!-- CUOTAS MENSUALES DE LA HIPOTECA (SIN SEPARAR INTERESES) -->
+      <div class="mt-8 bg-slate-900 rounded-2xl text-white p-6 shadow-md">
+        <h3 class="text-sm font-bold text-slate-200 uppercase tracking-wider flex items-center justify-between">
+          <span>Cuotas Mensuales de la Hipoteca</span>
+          <span class="text-xs font-normal text-slate-400">Sistema Francés (Cuota mensual constante)</span>
+        </h3>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
+          
+          <!-- Cuota Persona 1 -->
+          <div class="bg-white/5 rounded-xl p-5 border border-blue-400/30 flex flex-col justify-between space-y-3">
+            <div>
+              <div class="flex items-center justify-between text-blue-300 text-xs font-semibold">
+                <span>Cuota Mensual <span class="name-display-p1">Persona 1</span></span>
+                <span class="w-2.5 h-2.5 rounded-full bg-blue-400"></span>
+              </div>
+              <div class="text-3xl font-black text-white mt-1" id="p1MonthlyPayment">0 €</div>
+            </div>
+            <div class="pt-2.5 border-t border-white/10 text-xs text-slate-400 flex justify-between items-center">
+              <span>Capital hipotecario <span class="name-display-p1">P1</span>:</span>
+              <span class="font-bold text-slate-200" id="p1FinancedCapitalDisplay">0 €</span>
+            </div>
+          </div>
+
+          <!-- Cuota Persona 2 -->
+          <div class="bg-white/5 rounded-xl p-5 border border-fuchsia-400/30 flex flex-col justify-between space-y-3">
+            <div>
+              <div class="flex items-center justify-between text-fuchsia-300 text-xs font-semibold">
+                <span>Cuota Mensual <span class="name-display-p2">Persona 2</span></span>
+                <span class="w-2.5 h-2.5 rounded-full bg-fuchsia-400"></span>
+              </div>
+              <div class="text-3xl font-black text-white mt-1" id="p2MonthlyPayment">0 €</div>
+            </div>
+            <div class="pt-2.5 border-t border-white/10 text-xs text-slate-400 flex justify-between items-center">
+              <span>Capital hipotecario <span class="name-display-p2">P2</span>:</span>
+              <span class="font-bold text-slate-200" id="p2FinancedCapitalDisplay">0 €</span>
+            </div>
+          </div>
+
+          <!-- Cuota Total Conjunta -->
+          <div class="bg-white/10 rounded-xl p-5 border border-emerald-400/40 flex flex-col justify-between space-y-3">
+            <div>
+              <div class="flex items-center justify-between text-emerald-300 text-xs font-semibold">
+                <span>Cuota Total Pareja</span>
+                <span class="w-2.5 h-2.5 rounded-full bg-emerald-400"></span>
+              </div>
+              <div class="text-3xl font-black text-emerald-300 mt-1" id="totalMonthlyPaymentDetailed">0 €</div>
+            </div>
+            <div class="pt-2.5 border-t border-white/10 text-xs text-slate-300 flex justify-between items-center">
+              <span>Total préstamo conjunto:</span>
+              <span class="font-bold text-emerald-300" id="totalFinancedCapitalDisplay">0 €</span>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Total de intereses pagados a lo largo de toda la hipoteca -->
+        <div class="mt-5 pt-3.5 border-t border-white/10 flex flex-wrap items-center justify-between text-xs text-slate-400 gap-2">
+          <span>Coste financiero total: Capital prestado (<strong id="lifetimeCapital" class="text-slate-200">0 €</strong>) + Total intereses acumulados (<strong id="lifetimeInterests" class="text-amber-300">0 €</strong>)</span>
+          <span>Total devuelto al banco: <strong id="lifetimeTotalRepaid" class="text-white font-bold text-sm">0 €</strong></span>
+        </div>
+
+        <!-- Gasto Mensual Fijo Vivienda (Hipoteca + Gastos de Comunidad) -->
+        <div class="mt-4 p-3.5 bg-white/10 rounded-xl border border-white/15 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
+          <div class="flex items-center gap-2.5">
+            <span class="w-2.5 h-2.5 rounded-full bg-amber-400 shrink-0"></span>
+            <div>
+              <span class="text-slate-200 font-semibold block">Gasto Mensual Fijo Vivienda (Cuota Hipoteca + Comunidad):</span>
+              <span class="text-[11px] text-slate-300">
+                Hipoteca: <span id="sec3MortgagePaymentPart" class="text-white font-medium">0 €</span> + Comunidad: <span id="sec3CommunityPaymentPart" class="text-amber-300 font-medium">0 €</span>
+                (<span id="sec3HousingPerPerson" class="text-slate-200 font-medium">0 €/mes cada uno al 50%</span>)
+              </span>
+            </div>
+          </div>
+          <div class="text-left sm:text-right shrink-0 w-full sm:w-auto flex sm:flex-col justify-between sm:justify-center items-center sm:items-end pt-2 sm:pt-0 border-t sm:border-t-0 border-white/10">
+            <div class="text-xl font-black text-amber-300" id="sec3TotalHousingMonthly">0 € /mes</div>
+            <span class="text-[10px] text-slate-400">Total comunidad <span id="sec3YearsLabel">30</span> años: <strong id="sec3LifetimeCommunity" class="text-slate-200">0 €</strong></span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECCIÓN 4: ANÁLISIS DE VIABILIDAD Y SALARIOS (14 PAGAS) -->
+    <section class="bg-white rounded-2xl shadow-xs border border-slate-200 p-6 md:p-8">
+      <div class="flex items-center justify-between pb-5 border-b border-slate-100">
+        <div class="flex items-center gap-3">
+          <div class="w-9 h-9 rounded-lg bg-amber-100 text-amber-800 flex items-center justify-center font-bold">4</div>
+          <div>
+            <h2 class="text-lg font-bold text-slate-900">Análisis de Viabilidad y Salarios (14 Pagas)</h2>
+            <p class="text-xs text-slate-500">Evaluación de esfuerzo financiero (regla del 30-35%), gastos corrientes y ahorro mensual libre</p>
+          </div>
+        </div>
+        <span class="text-xs font-semibold px-2.5 py-1 bg-slate-100 text-slate-600 rounded-md">Paso 4 de 5</span>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mt-6">
+        
+        <!-- VIABILIDAD PERSONA 1 -->
+        <div class="space-y-5 bg-slate-50/50 p-5 rounded-2xl border border-slate-200">
+          <div class="flex items-center justify-between">
+            <h3 class="font-bold text-blue-900 flex items-center gap-2">
+              <span class="w-3 h-3 rounded-full bg-blue-500"></span> <span class="name-display-p1">Persona 1</span>
+            </h3>
+            <span class="text-xs text-slate-500 font-medium">Sueldo neto en 14 pagas</span>
+          </div>
+
+          <!-- Salario Neto P1 -->
+          <div class="space-y-1.5">
+            <label for="p1Salary" class="block text-xs font-semibold text-slate-700">
+              Salario neto mensual (en 14 pagas)
+            </label>
+            <div class="relative rounded-xl">
+              <input type="number" id="p1Salary" min="0" step="50" value="2100"
+                class="w-full pl-3 pr-10 py-2.5 bg-white border border-slate-300 rounded-xl text-slate-900 font-bold focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-base transition-all">
+              <span class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-slate-400 font-medium">€/mes</span>
+            </div>
+            <div class="flex justify-between text-[11px] text-slate-400">
+              <span>Sueldo anual neto: <strong id="p1SalaryAnnual" class="text-slate-600">29.400 €</strong></span>
+              <span>Equivalente 12 pagas: <strong id="p1Salary12Pagas" class="text-slate-600">2.450 €/m</strong></span>
+            </div>
+          </div>
+
+          <!-- Gastos corrientes Personales/Hogar P1 -->
+          <div class="space-y-1.5">
+            <label for="p1LivingCosts" class="block text-xs font-semibold text-slate-700">
+              Gastos corrientes estimados (Comida, luz, suministros, ocio)
+            </label>
+            <div class="relative rounded-xl">
+              <input type="number" id="p1LivingCosts" min="0" step="25" value="650"
+                class="w-full pl-3 pr-10 py-2.5 bg-white border border-slate-300 rounded-xl text-slate-900 font-medium focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-base transition-all">
+              <span class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-slate-400 font-medium">€/mes</span>
+            </div>
+          </div>
+
+          <!-- TARJETA INDICADOR DE ESFUERZO PERSONA 1 -->
+          <div id="p1EffortCard" class="p-4 rounded-xl border transition-all space-y-3 bg-white">
+            <div class="flex items-center justify-between">
+              <div>
+                <span class="text-xs font-semibold text-slate-500">Tasa de Esfuerzo Hipotecario</span>
+                <div class="text-2xl font-black mt-0.5" id="p1EffortPercent">0%</div>
+              </div>
+              <span id="p1EffortTag" class="px-2.5 py-1 text-xs font-extrabold rounded-lg uppercase tracking-wider">
+                Calculando...
+              </span>
+            </div>
+
+            <!-- Barra Visual Esfuerzo -->
+            <div>
+              <div class="w-full bg-slate-200 h-2.5 rounded-full overflow-hidden">
+                <div id="p1EffortBar" class="h-full rounded-full transition-all duration-500" style="width: 0%;"></div>
+              </div>
+              <div class="flex justify-between text-[10px] text-slate-400 mt-1">
+                <span>0%</span>
+                <span class="text-emerald-600 font-semibold">30% Recomendado</span>
+                <span class="text-amber-600 font-semibold">35% Máximo</span>
+                <span>50%+</span>
+              </div>
+            </div>
+
+            <!-- Dinero Sobrante Mensual Libre P1 -->
+            <div class="pt-3 border-t border-slate-100 flex items-center justify-between">
+              <div>
+                <span class="text-xs text-slate-500 block">Dinero libre sobrante al mes:</span>
+                <span class="text-[11px] text-slate-400" id="p1FreeCashSubtitle">(Salario - Cuota - Gastos - 50% Comunidad)</span>
+              </div>
+              <div class="text-xl font-black" id="p1FreeCash">0 €</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- VIABILIDAD PERSONA 2 -->
+        <div class="space-y-5 bg-slate-50/50 p-5 rounded-2xl border border-slate-200">
+          <div class="flex items-center justify-between">
+            <h3 class="font-bold text-fuchsia-900 flex items-center gap-2">
+              <span class="w-3 h-3 rounded-full bg-fuchsia-500"></span> <span class="name-display-p2">Persona 2</span>
+            </h3>
+            <span class="text-xs text-slate-500 font-medium">Sueldo neto en 14 pagas</span>
+          </div>
+
+          <!-- Salario Neto P2 -->
+          <div class="space-y-1.5">
+            <label for="p2Salary" class="block text-xs font-semibold text-slate-700">
+              Salario neto mensual (en 14 pagas)
+            </label>
+            <div class="relative rounded-xl">
+              <input type="number" id="p2Salary" min="0" step="50" value="1900"
+                class="w-full pl-3 pr-10 py-2.5 bg-white border border-slate-300 rounded-xl text-slate-900 font-bold focus:ring-2 focus:ring-fuchsia-500 focus:border-fuchsia-500 text-base transition-all">
+              <span class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-slate-400 font-medium">€/mes</span>
+            </div>
+            <div class="flex justify-between text-[11px] text-slate-400">
+              <span>Sueldo anual neto: <strong id="p2SalaryAnnual" class="text-slate-600">26.600 €</strong></span>
+              <span>Equivalente 12 pagas: <strong id="p2Salary12Pagas" class="text-slate-600">2.217 €/m</strong></span>
+            </div>
+          </div>
+
+          <!-- Gastos corrientes Personales/Hogar P2 -->
+          <div class="space-y-1.5">
+            <label for="p2LivingCosts" class="block text-xs font-semibold text-slate-700">
+              Gastos corrientes estimados (Comida, luz, suministros, ocio)
+            </label>
+            <div class="relative rounded-xl">
+              <input type="number" id="p2LivingCosts" min="0" step="25" value="650"
+                class="w-full pl-3 pr-10 py-2.5 bg-white border border-slate-300 rounded-xl text-slate-900 font-medium focus:ring-2 focus:ring-fuchsia-500 focus:border-fuchsia-500 text-base transition-all">
+              <span class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-slate-400 font-medium">€/mes</span>
+            </div>
+          </div>
+
+          <!-- TARJETA INDICADOR DE ESFUERZO PERSONA 2 -->
+          <div id="p2EffortCard" class="p-4 rounded-xl border transition-all space-y-3 bg-white">
+            <div class="flex items-center justify-between">
+              <div>
+                <span class="text-xs font-semibold text-slate-500">Tasa de Esfuerzo Hipotecario</span>
+                <div class="text-2xl font-black mt-0.5" id="p2EffortPercent">0%</div>
+              </div>
+              <span id="p2EffortTag" class="px-2.5 py-1 text-xs font-extrabold rounded-lg uppercase tracking-wider">
+                Calculando...
+              </span>
+            </div>
+
+            <!-- Barra Visual Esfuerzo -->
+            <div>
+              <div class="w-full bg-slate-200 h-2.5 rounded-full overflow-hidden">
+                <div id="p2EffortBar" class="h-full rounded-full transition-all duration-500" style="width: 0%;"></div>
+              </div>
+              <div class="flex justify-between text-[10px] text-slate-400 mt-1">
+                <span>0%</span>
+                <span class="text-emerald-600 font-semibold">30% Recomendado</span>
+                <span class="text-amber-600 font-semibold">35% Máximo</span>
+                <span>50%+</span>
+              </div>
+            </div>
+
+            <!-- Dinero Sobrante Mensual Libre P2 -->
+            <div class="pt-3 border-t border-slate-100 flex items-center justify-between">
+              <div>
+                <span class="text-xs text-slate-500 block">Dinero libre sobrante al mes:</span>
+                <span class="text-[11px] text-slate-400" id="p2FreeCashSubtitle">(Salario - Cuota - Gastos - 50% Comunidad)</span>
+              </div>
+              <div class="text-xl font-black" id="p2FreeCash">0 €</div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Leyenda Semáforo de Viabilidad Financiera -->
+      <div class="mt-6 p-4 rounded-xl bg-slate-50 border border-slate-200 grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
+        <div class="flex items-start gap-2.5">
+          <span class="w-3 h-3 rounded-full bg-emerald-500 mt-0.5 shrink-0"></span>
+          <div>
+            <strong class="text-slate-800">&lt; 30% — Óptimo / Saludable:</strong>
+            <p class="text-slate-500 text-[11px]">Riesgo bajo. Margen suficiente para imprevistos o ahorro extra.</p>
+          </div>
+        </div>
+        <div class="flex items-start gap-2.5">
+          <span class="w-3 h-3 rounded-full bg-amber-500 mt-0.5 shrink-0"></span>
+          <div>
+            <strong class="text-slate-800">30% - 35% — En el límite:</strong>
+            <p class="text-slate-500 text-[11px]">Rango máximo prudencial recomendado por el Banco de España.</p>
+          </div>
+        </div>
+        <div class="flex items-start gap-2.5">
+          <span class="w-3 h-3 rounded-full bg-rose-500 mt-0.5 shrink-0"></span>
+          <div>
+            <strong class="text-slate-800">&gt; 35% — Sobreesfuerzo / Riesgo:</strong>
+            <p class="text-slate-500 text-[11px]">Riesgo alto de asfixia financiera o rechazo de concesión por los bancos.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECCIÓN 5: PORCENTAJE DE PROPIEDAD -->
+    <section class="bg-white rounded-2xl shadow-xs border border-slate-200 p-6 md:p-8">
+      <div class="flex items-center justify-between pb-5 border-b border-slate-100">
+        <div class="flex items-center gap-3">
+          <div class="w-9 h-9 rounded-lg bg-purple-100 text-purple-700 flex items-center justify-center font-bold">5</div>
+          <div>
+            <h2 class="text-lg font-bold text-slate-900">Porcentaje de Propiedad Legal Recomendado</h2>
+            <p class="text-xs text-slate-500">Cálculo proporcional exacto según aportación inicial total y deuda hipotecaria asumida</p>
+          </div>
+        </div>
+        <span class="text-xs font-semibold px-2.5 py-1 bg-slate-100 text-slate-600 rounded-md">Paso 5 de 5</span>
+      </div>
+
+      <!-- Barra Gráfica de Copropiedad -->
+      <div class="mt-6 space-y-4">
+        <div class="flex items-center justify-between text-sm font-bold">
+          <div class="flex items-center gap-2 text-blue-700">
+            <span class="w-3.5 h-3.5 rounded-full bg-blue-500"></span>
+            <span><span class="name-display-p1">Persona 1</span>: <span id="ownershipP1Percent">50.00%</span></span>
+          </div>
+          <div class="flex items-center gap-2 text-fuchsia-700">
+            <span><span class="name-display-p2">Persona 2</span>: <span id="ownershipP2Percent">50.00%</span></span>
+            <span class="w-3.5 h-3.5 rounded-full bg-fuchsia-500"></span>
+          </div>
+        </div>
+
+        <!-- Barra segmentada -->
+        <div class="w-full h-8 bg-slate-100 rounded-2xl overflow-hidden flex p-1 shadow-inner border border-slate-200">
+          <div id="barOwnershipP1" class="h-full bg-gradient-to-r from-blue-600 to-blue-500 rounded-l-xl transition-all duration-500 flex items-center justify-center text-white text-xs font-bold" style="width: 50%;">
+            <span id="barOwnershipP1Text">50%</span>
+          </div>
+          <div id="barOwnershipP2" class="h-full bg-gradient-to-r from-fuchsia-500 to-fuchsia-600 rounded-r-xl transition-all duration-500 flex items-center justify-center text-white text-xs font-bold" style="width: 50%;">
+            <span id="barOwnershipP2Text">50%</span>
+          </div>
+        </div>
+
+        <!-- Tabla Explicativa Desglose Notarial -->
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs border-collapse">
+            <thead>
+              <tr class="border-b border-slate-200 text-slate-400 font-semibold uppercase">
+                <th class="py-2.5 px-3">Miembro</th>
+                <th class="py-2.5 px-3">Aportación Entrada</th>
+                <th class="py-2.5 px-3">Donaciones / Ayudas</th>
+                <th class="py-2.5 px-3">Hipoteca Asumida</th>
+                <th class="py-2.5 px-3 text-amber-700">Intereses Préstamo</th>
+                <th class="py-2.5 px-3">Compromiso Compra</th>
+                <th class="py-2.5 px-3 font-bold text-slate-800">Desembolso Real</th>
+                <th class="py-2.5 px-3 text-right">Porcentaje Escritura</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100 font-medium">
+              <tr class="hover:bg-blue-50/30">
+                <td class="py-3 px-3 text-blue-900 font-bold flex items-center gap-2">
+                  <span class="w-2.5 h-2.5 rounded-full bg-blue-500"></span> <span class="name-display-p1">Persona 1</span>
+                </td>
+                <td class="py-3 px-3" id="tableP1Savings">35.000 €</td>
+                <td class="py-3 px-3" id="tableP1Donations">0 €</td>
+                <td class="py-3 px-3" id="tableP1Mortgage">127.850 €</td>
+                <td class="py-3 px-3 font-semibold text-amber-700" id="tableP1Interests">61.028 €</td>
+                <td class="py-3 px-3 font-bold text-slate-800" id="tableP1TotalCommitment">162.850 €</td>
+                <td class="py-3 px-3 font-bold text-blue-800" id="tableP1RealTotal">223.878 €</td>
+                <td class="py-3 px-3 text-right font-black text-blue-700 text-sm" id="tableP1Percent">50.00%</td>
+              </tr>
+              <tr class="hover:bg-fuchsia-50/30">
+                <td class="py-3 px-3 text-fuchsia-900 font-bold flex items-center gap-2">
+                  <span class="w-2.5 h-2.5 rounded-full bg-fuchsia-500"></span> <span class="name-display-p2">Persona 2</span>
+                </td>
+                <td class="py-3 px-3" id="tableP2Savings">35.000 €</td>
+                <td class="py-3 px-3" id="tableP2Donations">0 €</td>
+                <td class="py-3 px-3" id="tableP2Mortgage">127.850 €</td>
+                <td class="py-3 px-3 font-semibold text-amber-700" id="tableP2Interests">61.028 €</td>
+                <td class="py-3 px-3 font-bold text-slate-800" id="tableP2TotalCommitment">162.850 €</td>
+                <td class="py-3 px-3 font-bold text-fuchsia-800" id="tableP2RealTotal">223.878 €</td>
+                <td class="py-3 px-3 text-right font-black text-fuchsia-700 text-sm" id="tableP2Percent">50.00%</td>
+              </tr>
+              <tr class="bg-slate-50 font-bold text-slate-900">
+                <td class="py-3 px-3">Total Conjunto</td>
+                <td class="py-3 px-3" id="tableTotalSavings">70.000 €</td>
+                <td class="py-3 px-3" id="tableTotalDonations">0 €</td>
+                <td class="py-3 px-3" id="tableTotalMortgage">255.700 €</td>
+                <td class="py-3 px-3 text-amber-700 font-extrabold" id="tableTotalInterests">122.056 €</td>
+                <td class="py-3 px-3 text-indigo-700" id="tableGrandTotal">325.700 €</td>
+                <td class="py-3 px-3 text-indigo-950 font-black" id="tableGrandRealTotal">447.756 €</td>
+                <td class="py-3 px-3 text-right font-black text-slate-900">100.00%</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Apartado de Intereses Pagados y Desembolso Real a Largo Plazo -->
+        <div class="mt-6 pt-5 border-t border-slate-200/80 space-y-4">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+            <div class="flex items-center gap-2.5">
+              <div class="p-2 bg-amber-100 text-amber-800 rounded-lg">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+              </div>
+              <div>
+                <h3 class="text-sm font-bold text-slate-900">Apartado de Intereses Pagados y Coste Total Real</h3>
+                <p class="text-xs text-slate-500">Intereses totales a pagar al banco a lo largo del préstamo y desembolso total acumulado</p>
+              </div>
+            </div>
+            <span id="sec5InterestConditions" class="inline-flex items-center self-start sm:self-auto text-xs font-semibold px-2.5 py-1 bg-amber-50 text-amber-800 border border-amber-200 rounded-md">
+              TIN 2.80% · 30 años
+            </span>
+          </div>
+
+          <!-- Cards de Intereses Pagados y Desembolso Real -->
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <!-- Persona 1 -->
+            <div class="p-4 rounded-xl border border-blue-200 bg-blue-50/40 space-y-3">
+              <div class="flex items-center justify-between">
+                <span class="text-xs font-bold text-blue-900 flex items-center gap-1.5">
+                  <span class="w-2.5 h-2.5 rounded-full bg-blue-500"></span> <span class="name-display-p1">Persona 1</span>
+                </span>
+              </div>
+              <div class="space-y-2 text-xs">
+                <div class="flex justify-between items-baseline text-slate-700 bg-blue-100/40 px-2 py-1 rounded-md">
+                  <span class="font-semibold text-blue-900">Entrada aportada:</span>
+                  <span id="sec5P1Down" class="font-bold text-blue-950">0 €</span>
+                </div>
+                <div class="flex justify-between items-baseline text-slate-500">
+                  <span>Capital financiado:</span>
+                  <span id="sec5P1Principal" class="font-medium text-slate-700">0 €</span>
+                </div>
+                <div class="flex justify-between items-baseline">
+                  <span class="text-slate-600">Intereses hipoteca:</span>
+                  <span id="sec5P1Interests" class="text-sm font-bold text-amber-700">0 €</span>
+                </div>
+                <div class="flex justify-between items-baseline text-slate-500">
+                  <span>Total devuelto banco (Cap. + Int.):</span>
+                  <span id="sec5P1TotalBank" class="font-semibold text-slate-800">0 €</span>
+                </div>
+                <div class="pt-2 border-t border-blue-200 space-y-1">
+                  <div class="flex justify-between items-baseline text-slate-600">
+                    <span class="font-medium">Desembolso sin intereses:</span>
+                    <span id="sec5P1OutlayWithoutInterest" class="font-bold text-slate-800">0 €</span>
+                  </div>
+                  <div class="flex justify-between items-baseline">
+                    <span class="font-bold text-blue-950">Desembolso con intereses:</span>
+                    <span id="sec5P1RealOutlay" class="text-sm font-black text-blue-700">0 €</span>
+                  </div>
+                </div>
+                <p class="text-[10px] text-slate-400 text-right">Entrada + Financiación (sin y con intereses)</p>
+              </div>
+            </div>
+
+            <!-- Persona 2 -->
+            <div class="p-4 rounded-xl border border-fuchsia-200 bg-fuchsia-50/40 space-y-3">
+              <div class="flex items-center justify-between">
+                <span class="text-xs font-bold text-fuchsia-900 flex items-center gap-1.5">
+                  <span class="w-2.5 h-2.5 rounded-full bg-fuchsia-500"></span> <span class="name-display-p2">Persona 2</span>
+                </span>
+              </div>
+              <div class="space-y-2 text-xs">
+                <div class="flex justify-between items-baseline text-slate-700 bg-fuchsia-100/40 px-2 py-1 rounded-md">
+                  <span class="font-semibold text-fuchsia-900">Entrada aportada:</span>
+                  <span id="sec5P2Down" class="font-bold text-fuchsia-950">0 €</span>
+                </div>
+                <div class="flex justify-between items-baseline text-slate-500">
+                  <span>Capital financiado:</span>
+                  <span id="sec5P2Principal" class="font-medium text-slate-700">0 €</span>
+                </div>
+                <div class="flex justify-between items-baseline">
+                  <span class="text-slate-600">Intereses hipoteca:</span>
+                  <span id="sec5P2Interests" class="text-sm font-bold text-amber-700">0 €</span>
+                </div>
+                <div class="flex justify-between items-baseline text-slate-500">
+                  <span>Total devuelto banco (Cap. + Int.):</span>
+                  <span id="sec5P2TotalBank" class="font-semibold text-slate-800">0 €</span>
+                </div>
+                <div class="pt-2 border-t border-fuchsia-200 space-y-1">
+                  <div class="flex justify-between items-baseline text-slate-600">
+                    <span class="font-medium">Desembolso sin intereses:</span>
+                    <span id="sec5P2OutlayWithoutInterest" class="font-bold text-slate-800">0 €</span>
+                  </div>
+                  <div class="flex justify-between items-baseline">
+                    <span class="font-bold text-fuchsia-950">Desembolso con intereses:</span>
+                    <span id="sec5P2RealOutlay" class="text-sm font-black text-fuchsia-700">0 €</span>
+                  </div>
+                </div>
+                <p class="text-[10px] text-slate-400 text-right">Entrada + Financiación (sin y con intereses)</p>
+              </div>
+            </div>
+
+            <!-- Total Conjunto -->
+            <div class="p-4 rounded-xl border border-slate-300 bg-slate-50 space-y-3">
+              <div class="flex items-center justify-between">
+                <span class="text-xs font-bold text-slate-900 flex items-center gap-1.5">
+                  <span class="w-2.5 h-2.5 rounded-full bg-slate-700"></span> Total Conjunto
+                </span>
+                <span class="text-[11px] font-bold px-2 py-0.5 rounded-full bg-amber-100 text-amber-800">Global Operación</span>
+              </div>
+              <div class="space-y-2 text-xs">
+                <div class="flex justify-between items-baseline text-slate-700 bg-slate-200/50 px-2 py-1 rounded-md">
+                  <span class="font-semibold text-slate-900">Entrada total pareja:</span>
+                  <span id="sec5TotalDown" class="font-bold text-slate-950">0 €</span>
+                </div>
+                <div class="flex justify-between items-baseline text-slate-500">
+                  <span>Capital total financiado:</span>
+                  <span id="sec5TotalPrincipal" class="font-medium text-slate-700">0 €</span>
+                </div>
+                <div class="flex justify-between items-baseline">
+                  <span class="text-slate-600">Total intereses pagados:</span>
+                  <span id="sec5TotalInterests" class="text-sm font-bold text-amber-700">0 €</span>
+                </div>
+                <div class="flex justify-between items-baseline text-slate-500">
+                  <span>Total devuelto banco (Cap. + Int.):</span>
+                  <span id="sec5TotalBank" class="font-semibold text-slate-800">0 €</span>
+                </div>
+                <div class="pt-2 border-t border-slate-200 space-y-1">
+                  <div class="flex justify-between items-baseline text-slate-600">
+                    <span class="font-medium">Coste sin intereses:</span>
+                    <span id="sec5TotalOutlayWithoutInterest" class="font-bold text-slate-800">0 €</span>
+                  </div>
+                  <div class="flex justify-between items-baseline">
+                    <span class="font-bold text-slate-900">Coste con intereses:</span>
+                    <span id="sec5TotalRealOutlay" class="text-sm font-black text-indigo-700">0 €</span>
+                  </div>
+                </div>
+                <p class="text-[10px] text-slate-400 text-right">Coste total compraventa (sin y con intereses)</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="p-3.5 bg-purple-50 rounded-xl border border-purple-200 text-xs text-purple-900 space-y-1">
+          <div class="font-bold flex items-center gap-1.5">
+            <svg class="w-4 h-4 text-purple-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+            Consejo Notarial para Parejas:
+          </div>
+          <p class="text-purple-800 text-[11px] leading-relaxed">
+            Si ambos aportáis cantidades diferentes para la compra o la reforma, podéis fijar estas proporciones exactas en la escritura de compraventa ante Notario. De este modo, si en el futuro se vende el inmueble o se disuelve el proindiviso, cada uno recuperará exactamente la parte que le corresponde de forma jurídicamente blindada y justa.
+          </p>
+        </div>
+
+        <!-- Tarjeta de Llamada a la Acción: Resumen Ejecutivo & PDF -->
+        <div class="mt-6 flex flex-col sm:flex-row items-center justify-between gap-4 p-4 rounded-xl bg-gradient-to-r from-emerald-50 via-slate-50 to-indigo-50 border border-emerald-200/80 shadow-2xs">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-emerald-600 text-white flex items-center justify-center shrink-0 shadow-xs">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+              </svg>
+            </div>
+            <div>
+              <h4 class="text-xs sm:text-sm font-bold text-slate-900">¿Quieres descargar el informe ejecutivo de esta vivienda?</h4>
+              <p class="text-[11px] text-slate-500">Obtén un documento PDF completo con todos los desgloses de costes, cuotas mensuales, esfuerzo y copropiedad notarial.</p>
+            </div>
+          </div>
+          <button id="btnOpenSummaryModalBottom" type="button" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl font-bold text-xs text-white bg-emerald-600 hover:bg-emerald-700 shadow-sm transition-all whitespace-nowrap self-stretch sm:self-auto justify-center">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+            </svg>
+            <span>Ver Resumen &amp; Descargar PDF</span>
+          </button>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- MODAL: RESUMEN EJECUTIVO & DESCARGA PDF -->
+  <div id="summaryModal" class="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-slate-900/60 backdrop-blur-xs hidden">
+    <div id="summaryModalDialog" class="bg-white rounded-2xl max-w-4xl w-full max-h-[92vh] flex flex-col shadow-2xl border border-slate-200 overflow-hidden">
+      
+      <!-- Encabezado Modal Resumen (No se imprime) -->
+      <div id="summaryModalHeader" class="flex items-center justify-between px-5 py-3.5 border-b border-slate-200 bg-slate-50 no-print">
+        <div class="flex items-center gap-3">
+          <div class="w-8 h-8 rounded-lg bg-emerald-600 text-white flex items-center justify-center shadow-xs">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+            </svg>
+          </div>
+          <div>
+            <h3 class="font-bold text-slate-900 text-sm sm:text-base">Resumen Ejecutivo de la Operación</h3>
+            <p class="text-[11px] text-slate-500">Informe completo de costes, cuotas, viabilidad y copropiedad</p>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-2">
+          <!-- Botón Imprimir -->
+          <button id="btnPrintSummary" class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg text-slate-700 bg-white hover:bg-slate-100 border border-slate-300 transition-colors shadow-2xs">
+            <svg class="w-4 h-4 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/>
+            </svg>
+            <span class="hidden sm:inline">Imprimir</span>
+          </button>
+
+          <!-- Botón Descargar PDF Principal -->
+          <button id="btnDownloadPdf" class="inline-flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-bold rounded-lg text-white bg-emerald-600 hover:bg-emerald-700 transition-all shadow-sm">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+            </svg>
+            <span>Descargar PDF</span>
+          </button>
+
+          <!-- Cerrar -->
+          <button id="btnCloseSummaryModal" class="text-slate-400 hover:text-slate-700 p-1.5 rounded-lg hover:bg-slate-200 transition-colors text-lg" title="Cerrar">&times;</button>
+        </div>
+      </div>
+
+      <!-- Contenedor con Scroll para Visualización y Exportación -->
+      <div class="flex-1 overflow-y-auto p-4 sm:p-8 bg-slate-50/50 custom-scrollbar">
+        <!-- DOCUMENTO INFORME PDF / IMPRESIÓN -->
+        <div id="summaryReportContent" class="bg-white p-6 sm:p-8 rounded-xl border border-slate-200 shadow-xs max-w-3xl mx-auto space-y-6 text-slate-800">
+          
+          <!-- Encabezado del Documento -->
+          <div class="border-b border-slate-200 pb-5">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div>
+                <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-indigo-50 text-indigo-700 border border-indigo-200 mb-2">
+                  CasaDos
+                </div>
+                <h1 class="text-xl sm:text-2xl font-black text-slate-900 tracking-tight" id="sumRepHouseTitle">Informe Financiero de Compra de Vivienda</h1>
+                <p class="text-xs text-slate-500 mt-0.5">Planificación económica, cuotas hipotecarias y reparto de propiedad en pareja</p>
+              </div>
+              <div class="sm:text-right text-xs text-slate-500 space-y-1">
+                <div>Fecha: <strong id="sumRepDate" class="text-slate-800"></strong></div>
+                <div>Régimen: <span id="sumRepTypeBadge" class="font-semibold text-slate-700"></span></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Resumen Clave / KPIs Destacados -->
+          <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 page-break-inside-avoid">
+            <div class="p-3 bg-slate-50 rounded-xl border border-slate-200">
+              <span class="text-[11px] text-slate-500 block font-medium">Coste Total Operación</span>
+              <span id="sumRepTotalCost" class="text-lg font-black text-slate-900">0 €</span>
+              <span class="text-[10px] text-slate-400 block">Vivienda + Impuestos + Reforma</span>
+            </div>
+            <div class="p-3 bg-emerald-50/60 rounded-xl border border-emerald-200">
+              <span class="text-[11px] text-emerald-800 block font-medium">Entrada Aportada Pareja</span>
+              <span id="sumRepTotalDown" class="text-lg font-black text-emerald-700">0 €</span>
+              <span id="sumRepDownPct" class="text-[10px] text-emerald-600 block">0% del total</span>
+            </div>
+            <div class="p-3 bg-sky-50/60 rounded-xl border border-sky-200">
+              <span class="text-[11px] text-sky-800 block font-medium">Hipoteca Total</span>
+              <span id="sumRepTotalMortgage" class="text-lg font-black text-sky-700">0 €</span>
+              <span id="sumRepMortgageLTV" class="text-[10px] text-sky-600 block">0% LTV</span>
+            </div>
+            <div class="p-3 bg-amber-50/60 rounded-xl border border-amber-200">
+              <span class="text-[11px] text-amber-800 block font-medium">Cuota Mensual Total</span>
+              <span id="sumRepMonthly" class="text-lg font-black text-amber-700">0 € /mes</span>
+              <span id="sumRepLoanTerms" class="text-[10px] text-amber-700 block">TIN 2.8% a 30 años</span>
+            </div>
+            <div class="p-3 bg-slate-50 rounded-xl border border-slate-200">
+              <span class="text-[11px] text-slate-500 block font-medium">Esfuerzo Financiero</span>
+              <span id="sumRepEffort" class="text-lg font-black text-slate-800">0%</span>
+              <span id="sumRepEffortStatus" class="text-[10px] font-semibold text-emerald-600 block">Saludable</span>
+            </div>
+            <div class="p-3 bg-purple-50/60 rounded-xl border border-purple-200">
+              <span class="text-[11px] text-purple-800 block font-medium">Reparto Notarial</span>
+              <span id="sumRepOwnership" class="text-lg font-black text-purple-900">50% / 50%</span>
+              <span class="text-[10px] text-purple-700 block">Escritura <span class="name-display-p1">P1</span> / <span class="name-display-p2">P2</span></span>
+            </div>
+          </div>
+
+          <!-- SECCIÓN 1: DESGLOSE DE LA COMPRAVENTA -->
+          <div class="space-y-2 page-break-inside-avoid">
+            <h4 class="text-xs font-bold uppercase tracking-wider text-slate-600 border-b border-slate-200 pb-1 flex items-center gap-1.5">
+              <span>1. Desglose del Coste de Adquisición</span>
+            </h4>
+            <div class="overflow-x-auto">
+              <table class="w-full text-xs text-left">
+                <tbody class="divide-y divide-slate-100">
+                  <tr><td class="py-1.5 text-slate-600">Precio de la vivienda (sin IVA):</td><td id="sumRepPrice" class="py-1.5 text-right font-semibold text-slate-800">0 €</td></tr>
+                  <tr><td class="py-1.5 text-slate-600">Impuestos (<span id="sumRepTaxType">IVA/ITP</span>):</td><td id="sumRepTaxes" class="py-1.5 text-right font-semibold text-slate-800">0 €</td></tr>
+                  <tr><td class="py-1.5 text-slate-600">Gastos de compraventa (Notaría, Registro, Gestoría, Tasación):</td><td id="sumRepClosing" class="py-1.5 text-right font-semibold text-slate-800">0 €</td></tr>
+                  <tr><td class="py-1.5 text-slate-600">Comisión inmobiliaria comprador (<span id="sumRepAgencyPct">3%</span>):</td><td id="sumRepAgency" class="py-1.5 text-right font-semibold text-slate-800">0 €</td></tr>
+                  <tr><td class="py-1.5 text-slate-600">Estimación de reformas o mejoras:</td><td id="sumRepRenovation" class="py-1.5 text-right font-semibold text-slate-800">0 €</td></tr>
+                  <tr><td class="py-1.5 text-slate-600">Gastos periódicos de comunidad:</td><td id="sumRepCommunity" class="py-1.5 text-right font-semibold text-amber-700">0 €/mes (0 €/año)</td></tr>
+                  <tr class="font-bold bg-slate-50"><td class="py-2 text-slate-900">COSTE TOTAL DE LA OPERACIÓN:</td><td id="sumRepGrandTotal" class="py-2 text-right text-indigo-700 font-extrabold text-sm">0 €</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- SECCIÓN 2: APORTACIÓN INICIAL Y FONDOS PROPIOS -->
+          <div class="space-y-2 page-break-inside-avoid">
+            <h4 class="text-xs font-bold uppercase tracking-wider text-slate-600 border-b border-slate-200 pb-1">
+              2. Fondos Propios Aportados (Entrada)
+            </h4>
+            <div class="grid grid-cols-2 gap-3 text-xs">
+              <div class="p-3 bg-blue-50/40 rounded-lg border border-blue-200">
+                <div class="font-bold text-blue-900 mb-1 flex items-center justify-between">
+                  <span class="name-display-p1">Persona 1</span>
+                  <span id="sumRepP1DownShare" class="text-[11px] font-semibold text-blue-700">50%</span>
+                </div>
+                <div class="space-y-1 text-slate-600">
+                  <div class="flex justify-between"><span>Ahorros:</span><span id="sumRepP1Savings" class="font-medium text-slate-800">0 €</span></div>
+                  <div class="flex justify-between"><span>Donaciones / Ayudas:</span><span id="sumRepP1Donations" class="font-medium text-slate-800">0 €</span></div>
+                  <div class="flex justify-between border-t border-blue-200 pt-1 font-bold text-blue-900">
+                    <span>Total Aportado:</span><span id="sumRepP1DownTotal">0 €</span>
+                  </div>
+                </div>
+              </div>
+              <div class="p-3 bg-fuchsia-50/40 rounded-lg border border-fuchsia-200">
+                <div class="font-bold text-fuchsia-900 mb-1 flex items-center justify-between">
+                  <span class="name-display-p2">Persona 2</span>
+                  <span id="sumRepP2DownShare" class="text-[11px] font-semibold text-fuchsia-700">50%</span>
+                </div>
+                <div class="space-y-1 text-slate-600">
+                  <div class="flex justify-between"><span>Ahorros:</span><span id="sumRepP2Savings" class="font-medium text-slate-800">0 €</span></div>
+                  <div class="flex justify-between"><span>Donaciones / Ayudas:</span><span id="sumRepP2Donations" class="font-medium text-slate-800">0 €</span></div>
+                  <div class="flex justify-between border-t border-fuchsia-200 pt-1 font-bold text-fuchsia-900">
+                    <span>Total Aportado:</span><span id="sumRepP2DownTotal">0 €</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- SECCIÓN 3: PRÉSTAMO HIPOTECARIO Y CUOTAS -->
+          <div class="space-y-2 page-break-inside-avoid">
+            <h4 class="text-xs font-bold uppercase tracking-wider text-slate-600 border-b border-slate-200 pb-1">
+              3. Hipoteca y Cuotas Mensuales
+            </h4>
+            <div class="grid grid-cols-3 gap-3 text-xs">
+              <div class="p-2.5 bg-blue-50/30 rounded-lg border border-blue-200">
+                <span class="font-bold text-blue-900 block name-display-p1">Persona 1</span>
+                <div class="mt-1 space-y-0.5 text-slate-600">
+                  <div class="flex justify-between"><span>Hipoteca:</span><span id="sumRepP1Mortgage" class="font-semibold text-slate-800">0 €</span></div>
+                  <div class="flex justify-between"><span>Cuota mensual:</span><span id="sumRepP1Monthly" class="font-bold text-blue-700">0 €</span></div>
+                </div>
+              </div>
+              <div class="p-2.5 bg-fuchsia-50/30 rounded-lg border border-fuchsia-200">
+                <span class="font-bold text-fuchsia-900 block name-display-p2">Persona 2</span>
+                <div class="mt-1 space-y-0.5 text-slate-600">
+                  <div class="flex justify-between"><span>Hipoteca:</span><span id="sumRepP2Mortgage" class="font-semibold text-slate-800">0 €</span></div>
+                  <div class="flex justify-between"><span>Cuota mensual:</span><span id="sumRepP2Monthly" class="font-bold text-fuchsia-700">0 €</span></div>
+                </div>
+              </div>
+              <div class="p-2.5 bg-slate-100/70 rounded-lg border border-slate-300">
+                <span class="font-bold text-slate-900 block">Total Pareja</span>
+                <div class="mt-1 space-y-0.5 text-slate-600">
+                  <div class="flex justify-between"><span>Hipoteca total:</span><span id="sumRepTotalMortgageRow" class="font-semibold text-slate-900">0 €</span></div>
+                  <div class="flex justify-between"><span>Cuota conjunta:</span><span id="sumRepTotalMonthlyRow" class="font-black text-amber-700">0 €</span></div>
+                </div>
+              </div>
+            </div>
+            <div class="mt-2 p-2 bg-slate-50 rounded-lg border border-slate-200 flex justify-between items-center text-xs">
+              <span class="text-slate-600">Gasto fijo mensual total (<strong class="text-slate-800">Cuota + Comunidad</strong>):</span>
+              <span id="sumRepTotalMonthlyWithComm" class="font-black text-amber-800 text-sm">0 € /mes</span>
+            </div>
+          </div>
+
+          <!-- SECCIÓN 4: VIABILIDAD FINANCIERA Y DINERO LIBRE -->
+          <div class="space-y-2 page-break-inside-avoid">
+            <h4 class="text-xs font-bold uppercase tracking-wider text-slate-600 border-b border-slate-200 pb-1">
+              4. Viabilidad Financiera y Dinero Libre Mensual
+            </h4>
+            <div class="grid grid-cols-3 gap-3 text-xs">
+              <div class="p-2.5 bg-slate-50 rounded-lg border border-slate-200">
+                <span class="font-bold text-blue-900 block name-display-p1">Persona 1</span>
+                <div class="mt-1 space-y-0.5 text-slate-600">
+                  <div class="flex justify-between"><span>Sueldo neto (14p):</span><span id="sumRepP1Salary" class="font-medium text-slate-800">0 €</span></div>
+                  <div class="flex justify-between"><span>Tasa de esfuerzo:</span><span id="sumRepP1Effort" class="font-bold text-slate-800">0%</span></div>
+                  <div class="flex justify-between pt-1 border-t border-slate-200"><span>Dinero libre:</span><span id="sumRepP1Free" class="font-bold text-emerald-700">0 €</span></div>
+                </div>
+              </div>
+              <div class="p-2.5 bg-slate-50 rounded-lg border border-slate-200">
+                <span class="font-bold text-fuchsia-900 block name-display-p2">Persona 2</span>
+                <div class="mt-1 space-y-0.5 text-slate-600">
+                  <div class="flex justify-between"><span>Sueldo neto (14p):</span><span id="sumRepP2Salary" class="font-medium text-slate-800">0 €</span></div>
+                  <div class="flex justify-between"><span>Tasa de esfuerzo:</span><span id="sumRepP2Effort" class="font-bold text-slate-800">0%</span></div>
+                  <div class="flex justify-between pt-1 border-t border-slate-200"><span>Dinero libre:</span><span id="sumRepP2Free" class="font-bold text-emerald-700">0 €</span></div>
+                </div>
+              </div>
+              <div class="p-2.5 bg-slate-50 rounded-lg border border-slate-200">
+                <span class="font-bold text-slate-900 block">Total Pareja</span>
+                <div class="mt-1 space-y-0.5 text-slate-600">
+                  <div class="flex justify-between"><span>Ingresos netos:</span><span id="sumRepTotalSalary" class="font-medium text-slate-800">0 €</span></div>
+                  <div class="flex justify-between"><span>Esfuerzo conjunto:</span><span id="sumRepEffortRow" class="font-bold text-slate-800">0%</span></div>
+                  <div class="flex justify-between pt-1 border-t border-slate-200"><span>Dinero libre pareja:</span><span id="sumRepTotalFree" class="font-black text-emerald-700">0 €</span></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- SECCIÓN 5: REPARTO DE PROPIEDAD LEGAL -->
+          <div class="space-y-2 page-break-inside-avoid">
+            <h4 class="text-xs font-bold uppercase tracking-wider text-slate-600 border-b border-slate-200 pb-1">
+              5. Reparto Notarial Recomendado (Copropiedad)
+            </h4>
+            <div class="overflow-x-auto">
+              <table class="w-full text-xs text-left">
+                <thead class="text-slate-400 font-semibold border-b border-slate-200">
+                  <tr>
+                    <th class="py-1.5">Miembro</th>
+                    <th class="py-1.5 text-right">Aportación Entrada</th>
+                    <th class="py-1.5 text-right">Hipoteca Asumida</th>
+                    <th class="py-1.5 text-right">Compromiso Total</th>
+                    <th class="py-1.5 text-right font-bold">% Escritura Legal</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100">
+                  <tr>
+                    <td class="py-1.5 text-blue-900 font-bold name-display-p1">Persona 1</td>
+                    <td id="sumRepTableP1Down" class="py-1.5 text-right text-slate-700">0 €</td>
+                    <td id="sumRepTableP1Mortgage" class="py-1.5 text-right text-slate-700">0 €</td>
+                    <td id="sumRepTableP1Commit" class="py-1.5 text-right font-semibold text-slate-800">0 €</td>
+                    <td id="sumRepTableP1Pct" class="py-1.5 text-right font-black text-blue-700">50.00%</td>
+                  </tr>
+                  <tr>
+                    <td class="py-1.5 text-fuchsia-900 font-bold name-display-p2">Persona 2</td>
+                    <td id="sumRepTableP2Down" class="py-1.5 text-right text-slate-700">0 €</td>
+                    <td id="sumRepTableP2Mortgage" class="py-1.5 text-right text-slate-700">0 €</td>
+                    <td id="sumRepTableP2Commit" class="py-1.5 text-right font-semibold text-slate-800">0 €</td>
+                    <td id="sumRepTableP2Pct" class="py-1.5 text-right font-black text-fuchsia-700">50.00%</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- SECCIÓN 6: INTERESES PAGADOS Y COSTE REAL TOTAL -->
+          <div class="space-y-2 page-break-inside-avoid">
+            <h4 class="text-xs font-bold uppercase tracking-wider text-slate-600 border-b border-slate-200 pb-1">
+              6. Intereses del Préstamo y Desembolso Real a Largo Plazo
+            </h4>
+            <div class="grid grid-cols-3 gap-3 text-xs">
+              <div class="p-2.5 bg-amber-50/50 rounded-lg border border-amber-200">
+                <span class="font-bold text-blue-900 block name-display-p1">Persona 1</span>
+                <div class="mt-1 space-y-0.5 text-slate-600">
+                  <div class="flex justify-between"><span>Entrada aportada:</span><span id="sumRepP1DownOutlay" class="font-semibold text-blue-950">0 €</span></div>
+                  <div class="flex justify-between"><span>Intereses a pagar:</span><span id="sumRepP1Interest" class="font-semibold text-amber-700">0 €</span></div>
+                  <div class="flex justify-between"><span>Total banco (Cap. + Int.):</span><span id="sumRepP1Repaid" class="text-slate-800 font-medium">0 €</span></div>
+                  <div class="flex justify-between pt-1 border-t border-amber-200/60 text-slate-600">
+                    <span>Desembolso sin intereses:</span><span id="sumRepP1OutlayWithoutInterest" class="font-bold text-slate-800">0 €</span>
+                  </div>
+                  <div class="flex justify-between font-bold text-blue-900">
+                    <span>Desembolso con intereses:</span><span id="sumRepP1RealOutlay">0 €</span>
+                  </div>
+                </div>
+              </div>
+              <div class="p-2.5 bg-amber-50/50 rounded-lg border border-amber-200">
+                <span class="font-bold text-fuchsia-900 block name-display-p2">Persona 2</span>
+                <div class="mt-1 space-y-0.5 text-slate-600">
+                  <div class="flex justify-between"><span>Entrada aportada:</span><span id="sumRepP2DownOutlay" class="font-semibold text-fuchsia-950">0 €</span></div>
+                  <div class="flex justify-between"><span>Intereses a pagar:</span><span id="sumRepP2Interest" class="font-semibold text-amber-700">0 €</span></div>
+                  <div class="flex justify-between"><span>Total banco (Cap. + Int.):</span><span id="sumRepP2Repaid" class="text-slate-800 font-medium">0 €</span></div>
+                  <div class="flex justify-between pt-1 border-t border-amber-200/60 text-slate-600">
+                    <span>Desembolso sin intereses:</span><span id="sumRepP2OutlayWithoutInterest" class="font-bold text-slate-800">0 €</span>
+                  </div>
+                  <div class="flex justify-between font-bold text-fuchsia-900">
+                    <span>Desembolso con intereses:</span><span id="sumRepP2RealOutlay">0 €</span>
+                  </div>
+                </div>
+              </div>
+              <div class="p-2.5 bg-slate-100 rounded-lg border border-slate-300">
+                <span class="font-bold text-slate-900 block">Total Conjunto</span>
+                <div class="mt-1 space-y-0.5 text-slate-600">
+                  <div class="flex justify-between"><span>Entrada total pareja:</span><span id="sumRepTotalDownOutlay" class="font-semibold text-slate-950">0 €</span></div>
+                  <div class="flex justify-between"><span>Intereses totales:</span><span id="sumRepTotalInterest" class="font-bold text-amber-700">0 €</span></div>
+                  <div class="flex justify-between"><span>Total banco (Cap. + Int.):</span><span id="sumRepTotalRepaid" class="text-slate-900 font-medium">0 €</span></div>
+                  <div class="flex justify-between pt-1 border-t border-slate-300 text-slate-600">
+                    <span>Coste sin intereses:</span><span id="sumRepTotalOutlayWithoutInterest" class="font-bold text-slate-800">0 €</span>
+                  </div>
+                  <div class="flex justify-between font-black text-indigo-900">
+                    <span>Coste con intereses:</span><span id="sumRepGrandRealOutlay">0 €</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Pie de página informe -->
+          <div class="border-t border-slate-200 pt-3 text-[10px] text-slate-400 flex flex-col sm:flex-row justify-between items-center gap-1">
+            <span>Documento generado por <strong>CasaDos</strong></span>
+            <span>Cálculos financieros orientativos bajo el sistema de amortización francés</span>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Pie del Modal con Acciones (No se imprime) -->
+      <div id="summaryModalFooterActions" class="flex items-center justify-between px-5 py-3 border-t border-slate-200 bg-slate-50 no-print">
+        <span class="text-xs text-slate-500 hidden sm:inline">
+          Puedes guardar el PDF en tu equipo o imprimirlo directamente.
+        </span>
+        <div class="flex items-center gap-2 ml-auto">
+          <button type="button" id="btnCloseSummaryFooter" class="px-3.5 py-1.5 text-xs font-semibold text-slate-600 hover:bg-slate-200 rounded-lg transition-colors">
+            Cerrar
+          </button>
+          <button type="button" id="btnDownloadPdfFooter" class="inline-flex items-center gap-1.5 px-4 py-1.5 text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-700 rounded-lg transition-all shadow-xs">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+            </svg>
+            <span>Descargar PDF</span>
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- MODAL: GUARDAR SIMULACIÓN -->
+  <div id="saveModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs hidden">
+    <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-200 space-y-4">
+      <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+        <h3 class="font-bold text-slate-900 text-base flex items-center gap-2">
+          <svg class="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"/>
+          </svg>
+          Guardar Simulación de Vivienda
+        </h3>
+        <button id="btnCloseSaveModal" class="text-slate-400 hover:text-slate-600 text-lg">&times;</button>
+      </div>
+
+      <p class="text-xs text-slate-500">
+        Asigna un nombre reconocible a esta vivienda para poder compararla después con otras opciones en la tabla frente a frente.
+      </p>
+
+      <div class="space-y-1.5">
+        <label for="saveHouseName" class="block text-xs font-semibold text-slate-700">Nombre de la casa o referencia</label>
+        <input type="text" id="saveHouseName" placeholder="Ej: Piso en Chamberí 3 hab, Ático Poblenou..."
+          class="w-full px-3 py-2.5 border border-slate-300 rounded-xl text-sm font-medium focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none">
+      </div>
+
+      <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 text-xs space-y-1 text-slate-600">
+        <div class="flex justify-between"><span>Precio:</span> <strong id="modalPreviewPrice" class="text-slate-800">250.000 €</strong></div>
+        <div class="flex justify-between"><span>Coste Total:</span> <strong id="modalPreviewTotal" class="text-slate-800">318.200 €</strong></div>
+        <div class="flex justify-between"><span>Cuota Mensual Pareja:</span> <strong id="modalPreviewCuota" class="text-emerald-700">0 €/mes</strong></div>
+      </div>
+
+      <div class="flex items-center justify-end space-x-2 pt-2">
+        <button type="button" id="btnCancelSave" class="px-4 py-2 text-xs font-medium text-slate-600 hover:bg-slate-100 rounded-lg transition-colors">
+          Cancelar
+        </button>
+        <button type="button" id="btnConfirmSave" class="px-4 py-2 text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg transition-colors shadow-xs">
+          Guardar en este navegador
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: COMPARADOR DE CASAS GUARDADAS -->
+  <div id="compareModal" class="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-slate-900/60 backdrop-blur-xs hidden">
+    <div class="bg-white rounded-2xl max-w-6xl w-full h-[90vh] flex flex-col shadow-2xl border border-slate-200 overflow-hidden">
+      
+      <!-- Encabezado Modal Comparador -->
+      <div class="flex items-center justify-between px-6 py-4 border-b border-slate-200 bg-slate-50">
+        <div class="flex items-center gap-3">
+          <div class="w-9 h-9 rounded-xl bg-indigo-600 text-white flex items-center justify-center">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+            </svg>
+          </div>
+          <div>
+            <h3 class="font-bold text-slate-900 text-base">Comparativa de Viviendas Guardadas</h3>
+            <p class="text-xs text-slate-500">Compara todas las opciones frente a frente para tomar la mejor decisión</p>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-2">
+          <button id="btnClearAllSaved" class="text-xs text-rose-600 hover:text-rose-800 font-semibold px-2 py-1 rounded hover:bg-rose-50 transition-colors">
+            Borrar todas
+          </button>
+          <button id="btnCloseCompareModal" class="p-2 text-slate-400 hover:text-slate-700 text-lg leading-none rounded-lg hover:bg-slate-100">
+            &times;
+          </button>
+        </div>
+      </div>
+
+      <!-- Contenido Comparador (Tabla Dinámica con scroll horizontal y vertical) -->
+      <div class="flex-1 overflow-auto p-6 custom-scrollbar" id="compareContentContainer">
+        <!-- Render dinámico de tabla o estado vacío -->
+      </div>
+
+      <!-- Footer Modal -->
+      <div class="px-6 py-3 border-t border-slate-200 bg-slate-50 flex items-center justify-between text-xs text-slate-500">
+        <span>Las simulaciones se guardan localmente en tu navegador (localStorage).</span>
+        <button id="btnCloseCompareFooter" class="px-4 py-2 font-medium text-slate-700 bg-white border border-slate-300 rounded-lg hover:bg-slate-100 transition-colors">
+          Cerrar
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- NOTIFICACIÓN TOAST FLOTANTE -->
+  <div id="toastNotification" class="fixed bottom-5 right-5 z-50 transition-all transform translate-y-20 opacity-0 pointer-events-none">
+    <div class="bg-slate-900 text-white px-4 py-3 rounded-xl shadow-xl border border-slate-800 flex items-center gap-3 text-xs font-semibold">
+      <span id="toastIcon" class="text-emerald-400">✓</span>
+      <span id="toastMessage">Operación completada</span>
+    </div>
+  </div>
+
+  <!-- JAVASCRIPT EMBEBIDO COMPLETO -->
+  <script>
+    // =========================================================================
+    // ESTADO DE LA APLICACIÓN & VALORES POR DEFECTO
+    // =========================================================================
+    const state = {
+      houseType: 'used', // 'new' | 'used'
+      price: 250000,
+      taxAmount: 15000, // editable (6% por defecto en seminueva)
+      renovationCosts: 50000,
+      closingCosts: 3200,
+      agencyFeePercent: 3, // 3% por defecto en seminueva
+      
+      // Aportaciones Pareja
+      p1Savings: 35000,
+      p1Donations: 0,
+      p2Savings: 35000,
+      p2Donations: 0,
+
+      // Hipoteca (100% Automática)
+      interestRate: 2.8,
+      mortgageYears: 30,
+      p1MortgageRatio: 0.5, // 50% por defecto
+      p1Mortgage: 127850,
+      p2Mortgage: 127850,
+      autoMortgageTotal: 255700,
+
+      // Salarios & Gastos
+      p1Salary: 2100,
+      p1LivingCosts: 650,
+      p2Salary: 1900,
+      p2LivingCosts: 650,
+
+      // Nombres de las personas
+      p1Name: 'Persona 1',
+      p2Name: 'Persona 2',
+
+      // Gastos de Comunidad Mensuales
+      communityFee: 0
+    };
+
+    const STORAGE_KEY = 'hogarduo_simulaciones_vivienda_v1';
+
+    // =========================================================================
+    // UTILIDADES DE FORMATO Y MONEDA
+    // =========================================================================
+    const euroFormat = new Intl.NumberFormat('es-ES', {
+      style: 'currency',
+      currency: 'EUR',
+      maximumFractionDigits: 0
+    });
+
+    const euroDecimalsFormat = new Intl.NumberFormat('es-ES', {
+      style: 'currency',
+      currency: 'EUR',
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    });
+
+    const percentFormat = new Intl.NumberFormat('es-ES', {
+      minimumFractionDigits: 1,
+      maximumFractionDigits: 1
+    });
+
+    function formatEUR(val) {
+      return euroFormat.format(Math.round(val || 0));
+    }
+
+    function formatEURDecimals(val) {
+      return euroDecimalsFormat.format(val || 0);
+    }
+
+    function formatPCT(val) {
+      return percentFormat.format(val || 0) + '%';
+    }
+
+    function showToast(message, isError = false) {
+      const toast = document.getElementById('toastNotification');
+      const msg = document.getElementById('toastMessage');
+      const icon = document.getElementById('toastIcon');
+
+      msg.innerText = message;
+      icon.innerHTML = isError ? '⚠️' : '✓';
+      icon.className = isError ? 'text-rose-400' : 'text-emerald-400';
+
+      toast.classList.remove('translate-y-20', 'opacity-0');
+      toast.classList.add('translate-y-0', 'opacity-100');
+
+      setTimeout(() => {
+        toast.classList.remove('translate-y-0', 'opacity-100');
+        toast.classList.add('translate-y-20', 'opacity-0');
+      }, 3000);
+    }
+
+    // =========================================================================
+    // CÁLCULO FINANCIERO: SISTEMA DE AMORTIZACIÓN FRANCÉS
+    // =========================================================================
+    /**
+     * Calcula la cuota mensual constante, amortización e intereses mensuales
+     * @param {number} principal - Capital a financiar
+     * @param {number} annualRate - TIN en porcentaje (ej 2.8)
+     * @param {number} years - Plazo en años (ej 30)
+     */
+    function calculateMortgage(principal, annualRate, years) {
+      if (principal <= 0 || years <= 0) {
+        return { monthlyPayment: 0, monthlyInterest: 0, monthlyPrincipal: 0, totalInterest: 0, totalRepaid: 0 };
+      }
+
+      const monthlyRate = (annualRate / 100) / 12;
+      const totalMonths = years * 12;
+
+      let monthlyPayment = 0;
+      if (monthlyRate === 0) {
+        monthlyPayment = principal / totalMonths;
+      } else {
+        monthlyPayment = principal * (monthlyRate * Math.pow(1 + monthlyRate, totalMonths)) / (Math.pow(1 + monthlyRate, totalMonths) - 1);
+      }
+
+      // Desglose del primer mes (muy ilustrativo de los intereses y amortización inicial)
+      const monthlyInterest = principal * monthlyRate;
+      const monthlyPrincipal = monthlyPayment - monthlyInterest;
+
+      const totalRepaid = monthlyPayment * totalMonths;
+      const totalInterest = totalRepaid - principal;
+
+      return {
+        monthlyPayment: Math.max(0, monthlyPayment),
+        monthlyInterest: Math.max(0, monthlyInterest),
+        monthlyPrincipal: Math.max(0, monthlyPrincipal),
+        totalInterest: Math.max(0, totalInterest),
+        totalRepaid: Math.max(0, totalRepaid)
+      };
+    }
+
+    // =========================================================================
+    // FUNCIÓN PRINCIPAL DE RECÁLCULO Y SINCRONIZACIÓN DE UI
+    // =========================================================================
+    function recalculateAll(syncMortgageInputs = true) {
+      // 0. Nombres de las personas
+      const p1NameInput = document.getElementById('p1Name');
+      const p2NameInput = document.getElementById('p2Name');
+      const p1Name = (p1NameInput && p1NameInput.value.trim()) ? p1NameInput.value.trim() : (state.p1Name || 'Persona 1');
+      const p2Name = (p2NameInput && p2NameInput.value.trim()) ? p2NameInput.value.trim() : (state.p2Name || 'Persona 2');
+      state.p1Name = p1Name;
+      state.p2Name = p2Name;
+
+      document.querySelectorAll('.name-display-p1').forEach(el => { el.innerText = p1Name; });
+      document.querySelectorAll('.name-display-p2').forEach(el => { el.innerText = p2Name; });
+
+      // 1. Lectura y asignación de datos de la vivienda
+      const price = Math.max(0, parseFloat(document.getElementById('housePrice').value) || 0);
+      state.price = price;
+
+      const agencyFeePercent = Math.max(0, parseFloat(document.getElementById('agencyFeePercent').value) || 0);
+      state.agencyFeePercent = agencyFeePercent;
+      const agencyFeeAmount = (price * agencyFeePercent) / 100;
+      document.getElementById('agencyAmountDisplay').innerText = formatEUR(agencyFeeAmount);
+
+      const closingCosts = Math.max(0, parseFloat(document.getElementById('closingCosts').value) || 0);
+      state.closingCosts = closingCosts;
+
+      const renovationCosts = state.houseType === 'used' ? Math.max(0, parseFloat(document.getElementById('renovationCosts').value) || 0) : 0;
+      state.renovationCosts = renovationCosts;
+
+      const taxAmount = Math.max(0, parseFloat(document.getElementById('taxAmount').value) || 0);
+      state.taxAmount = taxAmount;
+
+      // Gastos de comunidad periódicos
+      const communityFee = Math.max(0, parseFloat(document.getElementById('communityFee').value) || 0);
+      state.communityFee = communityFee;
+      const communityAnnual = communityFee * 12;
+      const community30Years = communityFee * 12 * 30;
+
+      const commAnnualEl = document.getElementById('communityAnnualDisplay');
+      if (commAnnualEl) commAnnualEl.innerText = `${formatEUR(communityAnnual)}/año`;
+      const comm30YEl = document.getElementById('community30YearsDisplay');
+      if (comm30YEl) comm30YEl.innerText = formatEUR(community30Years);
+      const commSumEl = document.getElementById('sumCommunityDisplay');
+      if (commSumEl) commSumEl.innerText = `${formatEUR(communityFee)}/mes`;
+
+      // Coste total de la compraventa
+      const totalOperationCost = price + taxAmount + closingCosts + agencyFeeAmount + renovationCosts;
+
+      // Actualizar desgloses de sección 1
+      document.getElementById('sumPrice').innerText = formatEUR(price);
+      document.getElementById('sumTaxesAndFees').innerText = formatEUR(taxAmount + closingCosts + agencyFeeAmount);
+      document.getElementById('sumRenovation').innerText = state.houseType === 'used' ? formatEUR(renovationCosts) : '0 € (Obra nueva)';
+      document.getElementById('sumTotalOperation').innerText = formatEUR(totalOperationCost);
+
+      // 2. Aportaciones Pareja
+      const p1Savings = Math.max(0, parseFloat(document.getElementById('p1Savings').value) || 0);
+      const p1Donations = Math.max(0, parseFloat(document.getElementById('p1Donations').value) || 0);
+      const p1InitialTotal = p1Savings + p1Donations;
+      state.p1Savings = p1Savings;
+      state.p1Donations = p1Donations;
+
+      const p2Savings = Math.max(0, parseFloat(document.getElementById('p2Savings').value) || 0);
+      const p2Donations = Math.max(0, parseFloat(document.getElementById('p2Donations').value) || 0);
+      const p2InitialTotal = p2Savings + p2Donations;
+      state.p2Savings = p2Savings;
+      state.p2Donations = p2Donations;
+
+      const totalDownpayment = p1InitialTotal + p2InitialTotal;
+
+      document.getElementById('p1TotalAportacionBadge').innerText = `Aporta: ${formatEUR(p1InitialTotal)}`;
+      document.getElementById('p1InitialFunds').innerText = formatEUR(p1InitialTotal);
+      document.getElementById('p2TotalAportacionBadge').innerText = `Aporta: ${formatEUR(p2InitialTotal)}`;
+      document.getElementById('p2InitialFunds').innerText = formatEUR(p2InitialTotal);
+
+      document.getElementById('sumBothDownpayment').innerText = formatEUR(totalDownpayment);
+      const downpaymentPct = totalOperationCost > 0 ? (totalDownpayment / totalOperationCost) * 100 : 0;
+      document.getElementById('sumBothDownpaymentPercent').innerText = `(${formatPCT(downpaymentPct)} del coste total)`;
+
+      // HIPOTECA TOTAL NECESARIA: 100% AUTOMÁTICA
+      // Coste Total Operación menos Aportaciones de la Pareja
+      const autoMortgageNeeded = Math.max(0, totalOperationCost - totalDownpayment);
+      state.autoMortgageTotal = autoMortgageNeeded;
+      document.getElementById('theoreticalRemainingMortgage').innerText = formatEUR(autoMortgageNeeded);
+      document.getElementById('mortgageTotalCombined').value = formatEUR(autoMortgageNeeded);
+
+      // 3. Condiciones Hipoteca
+      const interestRate = Math.max(0, parseFloat(document.getElementById('interestRate').value) || 0);
+      const mortgageYears = Math.max(1, parseInt(document.getElementById('mortgageYears').value) || 30);
+      state.interestRate = interestRate;
+      state.mortgageYears = mortgageYears;
+
+      document.getElementById('totalInstallmentsText').innerText = mortgageYears * 12;
+
+      // Sincronización automática de hipotecas individuales si se solicita
+      if (syncMortgageInputs) {
+        const ratio = (typeof state.p1MortgageRatio === 'number') ? state.p1MortgageRatio : 0.5;
+        const p1Calc = Math.round(autoMortgageNeeded * ratio);
+        const p2Calc = Math.max(0, autoMortgageNeeded - p1Calc);
+        document.getElementById('p1Mortgage').value = p1Calc;
+        document.getElementById('p2Mortgage').value = p2Calc;
+      }
+
+      const p1Mortgage = Math.max(0, parseFloat(document.getElementById('p1Mortgage').value) || 0);
+      const p2Mortgage = Math.max(0, parseFloat(document.getElementById('p2Mortgage').value) || 0);
+      state.p1Mortgage = p1Mortgage;
+      state.p2Mortgage = p2Mortgage;
+
+      const totalMortgage = p1Mortgage + p2Mortgage;
+
+      const p1MortgagePct = totalMortgage > 0 ? (p1Mortgage / totalMortgage) * 100 : 50;
+      const p2MortgagePct = totalMortgage > 0 ? (p2Mortgage / totalMortgage) * 100 : 50;
+      document.getElementById('p1MortgageSharePct').innerText = formatPCT(p1MortgagePct);
+      document.getElementById('p2MortgageSharePct').innerText = formatPCT(p2MortgagePct);
+
+      // Actualizar slider de reparto de hipoteca
+      const splitSlider = document.getElementById('mortgageSplitSlider');
+      if (splitSlider) {
+        const currentPct = Math.round(p1MortgagePct);
+        splitSlider.value = currentPct;
+        const lbl1 = document.getElementById('sliderP1Pct');
+        const lbl2 = document.getElementById('sliderP2Pct');
+        if (lbl1) lbl1.innerText = `${currentPct}%`;
+        if (lbl2) lbl2.innerText = `${100 - currentPct}%`;
+      }
+
+      // Cálculos Financieros Franceses
+      const finP1 = calculateMortgage(p1Mortgage, interestRate, mortgageYears);
+      const finP2 = calculateMortgage(p2Mortgage, interestRate, mortgageYears);
+      const finTotal = calculateMortgage(totalMortgage, interestRate, mortgageYears);
+
+      // Cuota Persona 1
+      document.getElementById('p1MonthlyPayment').innerText = formatEURDecimals(finP1.monthlyPayment);
+      document.getElementById('p1FinancedCapitalDisplay').innerText = formatEUR(p1Mortgage);
+
+      // Cuota Persona 2
+      document.getElementById('p2MonthlyPayment').innerText = formatEURDecimals(finP2.monthlyPayment);
+      document.getElementById('p2FinancedCapitalDisplay').innerText = formatEUR(p2Mortgage);
+
+      // Cuota Total Conjunta
+      document.getElementById('totalMonthlyPaymentDetailed').innerText = formatEURDecimals(finTotal.monthlyPayment);
+      document.getElementById('totalFinancedCapitalDisplay').innerText = formatEUR(totalMortgage);
+
+      document.getElementById('lifetimeCapital').innerText = formatEUR(totalMortgage);
+      document.getElementById('lifetimeInterests').innerText = formatEUR(finTotal.totalInterest);
+      document.getElementById('lifetimeTotalRepaid').innerText = formatEUR(finTotal.totalRepaid);
+
+      // Gasto Fijo Mensual Vivienda (Hipoteca + Gastos de Comunidad)
+      const communityTotalLifetime = communityFee * 12 * mortgageYears;
+      const totalHousingMonthly = finTotal.monthlyPayment + communityFee;
+      const p1HousingMonthly = finP1.monthlyPayment + (communityFee / 2);
+      const p2HousingMonthly = finP2.monthlyPayment + (communityFee / 2);
+
+      const sec3MortgagePart = document.getElementById('sec3MortgagePaymentPart');
+      if (sec3MortgagePart) sec3MortgagePart.innerText = `${formatEURDecimals(finTotal.monthlyPayment)} /m`;
+      const sec3CommPart = document.getElementById('sec3CommunityPaymentPart');
+      if (sec3CommPart) sec3CommPart.innerText = `${formatEUR(communityFee)} /m`;
+      const sec3PerPerson = document.getElementById('sec3HousingPerPerson');
+      if (sec3PerPerson) sec3PerPerson.innerText = `${formatEURDecimals(totalHousingMonthly / 2)} /m cada uno (50%)`;
+      const sec3TotalHousing = document.getElementById('sec3TotalHousingMonthly');
+      if (sec3TotalHousing) sec3TotalHousing.innerText = `${formatEURDecimals(totalHousingMonthly)} /mes`;
+      const sec3YearsLbl = document.getElementById('sec3YearsLabel');
+      if (sec3YearsLbl) sec3YearsLbl.innerText = mortgageYears;
+      const sec3LifetimeComm = document.getElementById('sec3LifetimeCommunity');
+      if (sec3LifetimeComm) sec3LifetimeComm.innerText = formatEUR(communityTotalLifetime);
+
+      // 4. Salarios (14 Pagas) y Viabilidad
+      const p1Salary = Math.max(0, parseFloat(document.getElementById('p1Salary').value) || 0);
+      const p1LivingCosts = Math.max(0, parseFloat(document.getElementById('p1LivingCosts').value) || 0);
+      state.p1Salary = p1Salary;
+      state.p1LivingCosts = p1LivingCosts;
+
+      const p2Salary = Math.max(0, parseFloat(document.getElementById('p2Salary').value) || 0);
+      const p2LivingCosts = Math.max(0, parseFloat(document.getElementById('p2LivingCosts').value) || 0);
+      state.p2Salary = p2Salary;
+      state.p2LivingCosts = p2LivingCosts;
+
+      // Anual y prorrateo 12 pagas
+      const p1SalaryAnnual = p1Salary * 14;
+      const p1SalaryMonthlyAvg = p1SalaryAnnual / 12;
+      document.getElementById('p1SalaryAnnual').innerText = formatEUR(p1SalaryAnnual);
+      document.getElementById('p1Salary12Pagas').innerText = formatEUR(p1SalaryMonthlyAvg) + '/m';
+
+      const p2SalaryAnnual = p2Salary * 14;
+      const p2SalaryMonthlyAvg = p2SalaryAnnual / 12;
+      document.getElementById('p2SalaryAnnual').innerText = formatEUR(p2SalaryAnnual);
+      document.getElementById('p2Salary12Pagas').innerText = formatEUR(p2SalaryMonthlyAvg) + '/m';
+
+      // Esfuerzo Financiero: Se calcula sobre el sueldo mensual en 14 pagas
+      const p1EffortRatio = p1Salary > 0 ? (finP1.monthlyPayment / p1Salary) * 100 : 0;
+      const p2EffortRatio = p2Salary > 0 ? (finP2.monthlyPayment / p2Salary) * 100 : 0;
+      const totalSalary = p1Salary + p2Salary;
+      const totalEffortRatio = totalSalary > 0 ? (finTotal.monthlyPayment / totalSalary) * 100 : 0;
+
+      updateEffortUI('p1', p1EffortRatio);
+      updateEffortUI('p2', p2EffortRatio);
+
+      // Dinero Sobrante Mensual Libre
+      // Se deduce el 50% de la cuota de comunidad a cada miembro
+      const p1CommunityShare = communityFee / 2;
+      const p2CommunityShare = communityFee / 2;
+
+      const p1FreeCash = p1Salary - finP1.monthlyPayment - p1LivingCosts - p1CommunityShare;
+      const p2FreeCash = p2Salary - finP2.monthlyPayment - p2LivingCosts - p2CommunityShare;
+      const totalFreeCash = p1FreeCash + p2FreeCash;
+
+      updateFreeCashUI('p1FreeCash', p1FreeCash);
+      updateFreeCashUI('p2FreeCash', p2FreeCash);
+      updateFreeCashUI('kpiFreeCashTotal', totalFreeCash);
+
+      const p1Subtitle = document.getElementById('p1FreeCashSubtitle');
+      if (p1Subtitle) {
+        p1Subtitle.innerText = communityFee > 0 
+          ? `(Salario - Cuota - Gastos - ${formatEUR(p1CommunityShare)} com.)` 
+          : `(Salario - Cuota - Gastos)`;
+      }
+      const p2Subtitle = document.getElementById('p2FreeCashSubtitle');
+      if (p2Subtitle) {
+        p2Subtitle.innerText = communityFee > 0 
+          ? `(Salario - Cuota - Gastos - ${formatEUR(p2CommunityShare)} com.)` 
+          : `(Salario - Cuota - Gastos)`;
+      }
+
+      // 5. Porcentaje de Propiedad
+      const p1TotalCommitment = p1InitialTotal + p1Mortgage;
+      const p2TotalCommitment = p2InitialTotal + p2Mortgage;
+      const totalCommitment = p1TotalCommitment + p2TotalCommitment;
+
+      let p1Ownership = 50;
+      let p2Ownership = 50;
+      if (totalCommitment > 0) {
+        p1Ownership = (p1TotalCommitment / totalCommitment) * 100;
+        p2Ownership = (p2TotalCommitment / totalCommitment) * 100;
+      }
+
+      document.getElementById('ownershipP1Percent').innerText = formatPCT(p1Ownership);
+      document.getElementById('ownershipP2Percent').innerText = formatPCT(p2Ownership);
+
+      document.getElementById('barOwnershipP1').style.width = `${Math.min(100, Math.max(0, p1Ownership))}%`;
+      document.getElementById('barOwnershipP2').style.width = `${Math.min(100, Math.max(0, p2Ownership))}%`;
+      document.getElementById('barOwnershipP1Text').innerText = formatPCT(p1Ownership);
+      document.getElementById('barOwnershipP2Text').innerText = formatPCT(p2Ownership);
+
+      // Tabla de Escrituras (Copropiedad Legal)
+      document.getElementById('tableP1Savings').innerText = formatEUR(p1Savings);
+      document.getElementById('tableP1Donations').innerText = formatEUR(p1Donations);
+      document.getElementById('tableP1Mortgage').innerText = formatEUR(p1Mortgage);
+      document.getElementById('tableP1Interests').innerText = formatEUR(finP1.totalInterest);
+      document.getElementById('tableP1TotalCommitment').innerText = formatEUR(p1TotalCommitment);
+      const p1RealOutlay = p1InitialTotal + finP1.totalRepaid;
+      document.getElementById('tableP1RealTotal').innerText = formatEUR(p1RealOutlay);
+      document.getElementById('tableP1Percent').innerText = formatPCT(p1Ownership);
+
+      document.getElementById('tableP2Savings').innerText = formatEUR(p2Savings);
+      document.getElementById('tableP2Donations').innerText = formatEUR(p2Donations);
+      document.getElementById('tableP2Mortgage').innerText = formatEUR(p2Mortgage);
+      document.getElementById('tableP2Interests').innerText = formatEUR(finP2.totalInterest);
+      document.getElementById('tableP2TotalCommitment').innerText = formatEUR(p2TotalCommitment);
+      const p2RealOutlay = p2InitialTotal + finP2.totalRepaid;
+      document.getElementById('tableP2RealTotal').innerText = formatEUR(p2RealOutlay);
+      document.getElementById('tableP2Percent').innerText = formatPCT(p2Ownership);
+
+      const totalRealOutlay = totalOperationCost + finTotal.totalInterest;
+      document.getElementById('tableTotalSavings').innerText = formatEUR(totalDownpayment - (p1Donations + p2Donations));
+      document.getElementById('tableTotalDonations').innerText = formatEUR(p1Donations + p2Donations);
+      document.getElementById('tableTotalMortgage').innerText = formatEUR(totalMortgage);
+      document.getElementById('tableTotalInterests').innerText = formatEUR(finTotal.totalInterest);
+      document.getElementById('tableGrandTotal').innerText = formatEUR(totalCommitment);
+      document.getElementById('tableGrandRealTotal').innerText = formatEUR(totalRealOutlay);
+
+      // Apartado de Intereses Pagados (Cards Sección 5)
+      const sec5Conditions = document.getElementById('sec5InterestConditions');
+      if (sec5Conditions) {
+        sec5Conditions.innerText = `TIN ${interestRate}% · ${mortgageYears} años`;
+      }
+
+      // Persona 1
+      document.getElementById('sec5P1Down').innerText = formatEUR(p1InitialTotal);
+      document.getElementById('sec5P1Principal').innerText = formatEUR(p1Mortgage);
+      document.getElementById('sec5P1Interests').innerText = formatEUR(finP1.totalInterest);
+      document.getElementById('sec5P1TotalBank').innerText = formatEUR(finP1.totalRepaid);
+      const sec5P1NoInt = document.getElementById('sec5P1OutlayWithoutInterest');
+      if (sec5P1NoInt) sec5P1NoInt.innerText = formatEUR(p1TotalCommitment);
+      document.getElementById('sec5P1RealOutlay').innerText = formatEUR(p1RealOutlay);
+
+      // Persona 2
+      document.getElementById('sec5P2Down').innerText = formatEUR(p2InitialTotal);
+      document.getElementById('sec5P2Principal').innerText = formatEUR(p2Mortgage);
+      document.getElementById('sec5P2Interests').innerText = formatEUR(finP2.totalInterest);
+      document.getElementById('sec5P2TotalBank').innerText = formatEUR(finP2.totalRepaid);
+      const sec5P2NoInt = document.getElementById('sec5P2OutlayWithoutInterest');
+      if (sec5P2NoInt) sec5P2NoInt.innerText = formatEUR(p2TotalCommitment);
+      document.getElementById('sec5P2RealOutlay').innerText = formatEUR(p2RealOutlay);
+
+      // Total Conjunto
+      document.getElementById('sec5TotalDown').innerText = formatEUR(totalDownpayment);
+      document.getElementById('sec5TotalPrincipal').innerText = formatEUR(totalMortgage);
+      document.getElementById('sec5TotalInterests').innerText = formatEUR(finTotal.totalInterest);
+      document.getElementById('sec5TotalBank').innerText = formatEUR(finTotal.totalRepaid);
+      const sec5TotNoInt = document.getElementById('sec5TotalOutlayWithoutInterest');
+      if (sec5TotNoInt) sec5TotNoInt.innerText = formatEUR(totalOperationCost);
+      document.getElementById('sec5TotalRealOutlay').innerText = formatEUR(totalRealOutlay);
+
+      // 6. Actualización de Barra KPI Superior
+      document.getElementById('kpiTotalCost').innerText = formatEUR(totalOperationCost);
+      document.getElementById('kpiHouseTypeSubtitle').innerText = `${state.houseType === 'new' ? 'Obra Nueva (IVA 10%)' : 'Seminueva (ITP 6% + Reforma)'}`;
+      document.getElementById('kpiTotalDownpayment').innerText = formatEUR(totalDownpayment);
+      document.getElementById('kpiDownpaymentPercent').innerText = `${formatPCT(downpaymentPct)} del coste total`;
+      document.getElementById('kpiMortgageTotal').innerText = formatEUR(totalMortgage);
+      const mortgageLTV = price > 0 ? (totalMortgage / price) * 100 : 0;
+      document.getElementById('kpiMortgagePercent').innerText = `${formatPCT(mortgageLTV)} sobre precio (LTV)`;
+      document.getElementById('kpiMonthlyPayment').innerText = `${formatEURDecimals(finTotal.monthlyPayment)} /mes`;
+      document.getElementById('kpiInterestRateSubtitle').innerText = `TIN ${interestRate}% a ${mortgageYears} años`;
+      document.getElementById('kpiEffortTotal').innerText = formatPCT(totalEffortRatio);
+
+      updateKPITotalEffortBadge(totalEffortRatio);
+
+      // 7. Alerta de Cuadre de Fondos
+      checkFinancialBalance(totalOperationCost, totalDownpayment, totalMortgage);
+
+      // 8. Sincronizar Informe Resumen Ejecutivo y PDF
+      renderSummaryReport({
+        p1Name,
+        p2Name,
+        price,
+        totalOperationCost,
+        taxAmount,
+        closingCosts,
+        agencyFeeAmount,
+        agencyFeePercent,
+        renovationCosts,
+        communityFee,
+        communityAnnual,
+        communityTotalLifetime,
+        totalHousingMonthly,
+        p1CommunityShare,
+        p2CommunityShare,
+        p1CommunityLifetime,
+        p2CommunityLifetime,
+        p1Savings,
+        p1Donations,
+        p1InitialTotal,
+        p2Savings,
+        p2Donations,
+        p2InitialTotal,
+        totalDownpayment,
+        downpaymentPct,
+        p1Mortgage,
+        p2Mortgage,
+        totalMortgage,
+        mortgageLTV,
+        interestRate,
+        mortgageYears,
+        finP1,
+        finP2,
+        finTotal,
+        p1Salary,
+        p2Salary,
+        p1EffortRatio,
+        p2EffortRatio,
+        totalEffortRatio,
+        p1FreeCash,
+        p2FreeCash,
+        totalFreeCash,
+        p1TotalCommitment,
+        p2TotalCommitment,
+        totalCommitment,
+        p1Ownership,
+        p2Ownership,
+        p1RealOutlay,
+        p2RealOutlay,
+        totalRealOutlay
+      });
+    }
+
+    // =========================================================================
+    // HELPERS DE UI: ESFUERZO, COLORES Y EQUILIBRIO
+    // =========================================================================
+    function updateEffortUI(personKey, effortRatio) {
+      const card = document.getElementById(`${personKey}EffortCard`);
+      const pctDisplay = document.getElementById(`${personKey}EffortPercent`);
+      const tagDisplay = document.getElementById(`${personKey}EffortTag`);
+      const barDisplay = document.getElementById(`${personKey}EffortBar`);
+
+      pctDisplay.innerText = formatPCT(effortRatio);
+      barDisplay.style.width = `${Math.min(100, Math.max(0, effortRatio * 2))}%`; // escala visual
+
+      // Regla del 30-35%
+      if (effortRatio <= 30) {
+        // Verde: Saludable
+        tagDisplay.innerText = 'Saludable (<30%)';
+        tagDisplay.className = 'px-2.5 py-1 text-xs font-extrabold rounded-lg uppercase tracking-wider bg-emerald-100 text-emerald-800 border border-emerald-300';
+        barDisplay.className = 'h-full rounded-full transition-all duration-500 bg-emerald-500';
+        pctDisplay.className = 'text-2xl font-black mt-0.5 text-emerald-700';
+        card.className = 'p-4 rounded-xl border-2 border-emerald-200 bg-emerald-50/30 transition-all space-y-3';
+      } else if (effortRatio <= 35) {
+        // Naranja: En el límite
+        tagDisplay.innerText = 'En el límite (30-35%)';
+        tagDisplay.className = 'px-2.5 py-1 text-xs font-extrabold rounded-lg uppercase tracking-wider bg-amber-100 text-amber-800 border border-amber-300';
+        barDisplay.className = 'h-full rounded-full transition-all duration-500 bg-amber-500';
+        pctDisplay.className = 'text-2xl font-black mt-0.5 text-amber-700';
+        card.className = 'p-4 rounded-xl border-2 border-amber-200 bg-amber-50/30 transition-all space-y-3';
+      } else {
+        // Rojo: Riesgo Alto
+        tagDisplay.innerText = 'Riesgo alto (>35%)';
+        tagDisplay.className = 'px-2.5 py-1 text-xs font-extrabold rounded-lg uppercase tracking-wider bg-rose-100 text-rose-800 border border-rose-300';
+        barDisplay.className = 'h-full rounded-full transition-all duration-500 bg-rose-500';
+        pctDisplay.className = 'text-2xl font-black mt-0.5 text-rose-700';
+        card.className = 'p-4 rounded-xl border-2 border-rose-300 bg-rose-50/40 transition-all space-y-3';
+      }
+    }
+
+    function updateKPITotalEffortBadge(effortRatio) {
+      const badge = document.getElementById('kpiEffortBadge');
+      if (effortRatio <= 30) {
+        badge.innerText = 'Saludable';
+        badge.className = 'text-[10px] uppercase font-bold px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/40';
+      } else if (effortRatio <= 35) {
+        badge.innerText = 'Límite 35%';
+        badge.className = 'text-[10px] uppercase font-bold px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/40';
+      } else {
+        badge.innerText = 'Riesgo Alto';
+        badge.className = 'text-[10px] uppercase font-bold px-1.5 py-0.5 rounded bg-rose-500/30 text-rose-200 border border-rose-500/50';
+      }
+    }
+
+    function updateFreeCashUI(elementId, amount) {
+      const el = document.getElementById(elementId);
+      el.innerText = formatEUR(amount);
+      if (amount < 0) {
+        el.className = 'text-xl font-black text-rose-600';
+      } else if (amount < 300) {
+        el.className = 'text-xl font-black text-amber-600';
+      } else {
+        el.className = 'text-xl font-black text-emerald-600';
+      }
+    }
+
+    function checkFinancialBalance(totalOperationCost, totalDownpayment, totalMortgage) {
+      const banner = document.getElementById('financialBalanceAlert');
+      const icon = document.getElementById('balanceIcon');
+      const text = document.getElementById('balanceText');
+      const btnAuto = document.getElementById('btnAutoBalance');
+
+      if (totalDownpayment >= totalOperationCost) {
+        banner.className = 'max-w-7xl mx-auto mt-3 px-3 py-2 rounded-lg text-xs flex items-center justify-between transition-all bg-emerald-950/70 border border-emerald-500/40 text-emerald-200';
+        icon.innerText = '✓';
+        text.innerHTML = '<strong>¡Financiación 100% cubierta!</strong> Las aportaciones de la pareja cubren la totalidad de la vivienda y gastos sin necesidad de hipoteca.';
+        btnAuto.classList.add('hidden');
+      } else {
+        banner.className = 'max-w-7xl mx-auto mt-3 px-3 py-2 rounded-lg text-xs flex items-center justify-between transition-all bg-emerald-950/70 border border-emerald-500/40 text-emerald-200';
+        icon.innerText = '✓';
+        text.innerHTML = `<strong>Hipoteca calculada automáticamente:</strong> La hipoteca necesaria de <strong>${formatEUR(totalMortgage)}</strong> más las aportaciones de la pareja (${formatEUR(totalDownpayment)}) cubren con total precisión el 100% de la operación (${formatEUR(totalOperationCost)}).`;
+        btnAuto.classList.add('hidden');
+      }
+    }
+
+    // =========================================================================
+    // EVENT HANDLERS & CAMBIO DE TIPO DE VIVIENDA
+    // =========================================================================
+    function setHouseType(type, recalculateDefaults = true, syncMortgage = true) {
+      state.houseType = type;
+      const btnNew = document.getElementById('btnTypeNew');
+      const btnUsed = document.getElementById('btnTypeUsed');
+      const reformsContainer = document.getElementById('reformsContainer');
+      const taxLabel = document.getElementById('taxLabel');
+      const typeTaxDesc = document.getElementById('typeTaxDescription');
+
+      if (type === 'new') {
+        btnNew.className = 'py-2 px-3 text-xs font-bold rounded-lg transition-all bg-white text-sky-700 shadow-xs border border-slate-200';
+        btnUsed.className = 'py-2 px-3 text-xs font-bold rounded-lg transition-all text-slate-600 hover:text-slate-900';
+        
+        // Esconder reforma si es obra nueva
+        reformsContainer.classList.add('hidden');
+        
+        taxLabel.innerText = 'Impuesto IVA (10% por defecto)';
+        typeTaxDesc.innerText = 'Obra nueva: Aplica 10% de IVA por defecto (editable).';
+
+        if (recalculateDefaults) {
+          const price = parseFloat(document.getElementById('housePrice').value) || 0;
+          document.getElementById('taxAmount').value = Math.round(price * 0.10);
+          document.getElementById('agencyFeePercent').value = 0; // 0% en obra nueva por defecto
+        }
+      } else {
+        btnUsed.className = 'py-2 px-3 text-xs font-bold rounded-lg transition-all bg-white text-indigo-700 shadow-xs border border-slate-200';
+        btnNew.className = 'py-2 px-3 text-xs font-bold rounded-lg transition-all text-slate-600 hover:text-slate-900';
+        
+        // Mostrar reforma si es seminueva
+        reformsContainer.classList.remove('hidden');
+        
+        taxLabel.innerText = 'Impuesto ITP (6% por defecto)';
+        typeTaxDesc.innerText = 'Seminueva / Segunda mano: Aplica 6% ITP por defecto (editable).';
+
+        if (recalculateDefaults) {
+          const price = parseFloat(document.getElementById('housePrice').value) || 0;
+          document.getElementById('taxAmount').value = Math.round(price * 0.06);
+          document.getElementById('agencyFeePercent').value = 3; // 3% en seminueva por defecto
+        }
+      }
+      recalculateAll(syncMortgage);
+    }
+
+    function setYears(years) {
+      document.getElementById('mortgageYears').value = years;
+      recalculateAll(true);
+    }
+
+    // Inputs que recalculan la operación completa y actualizan la hipoteca total necesaria
+    const genericInputIds = [
+      'housePrice', 'taxAmount', 'renovationCosts', 'closingCosts', 'agencyFeePercent', 'communityFee',
+      'p1Savings', 'p1Donations', 'p2Savings', 'p2Donations',
+      'interestRate', 'mortgageYears',
+      'p1Salary', 'p1LivingCosts', 'p2Salary', 'p2LivingCosts'
+    ];
+
+    genericInputIds.forEach(id => {
+      const el = document.getElementById(id);
+      if (el) {
+        el.addEventListener('input', () => recalculateAll(true));
+      }
+    });
+
+    // Escucha de cambio en los nombres de las personas
+    ['p1Name', 'p2Name'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) {
+        ['input', 'change'].forEach(evt => {
+          el.addEventListener(evt, () => recalculateAll(false));
+        });
+      }
+    });
+
+    // Sincronización bidireccional inmediata de hipotecas individuales:
+    // Al editar la hipoteca de un miembro, la del otro se auto-ajusta de forma instantánea al restante exacto
+    function handleP1MortgageInput() {
+      const totalNeeded = state.autoMortgageTotal || 0;
+      const p1El = document.getElementById('p1Mortgage');
+      if (p1El.value === '') return;
+      const p1Val = Math.max(0, parseFloat(p1El.value) || 0);
+      const p2Val = Math.max(0, totalNeeded - p1Val);
+      document.getElementById('p2Mortgage').value = p2Val;
+      state.p1MortgageRatio = totalNeeded > 0 ? (p1Val / totalNeeded) : 0.5;
+      recalculateAll(false);
+    }
+
+    function handleP2MortgageInput() {
+      const totalNeeded = state.autoMortgageTotal || 0;
+      const p2El = document.getElementById('p2Mortgage');
+      if (p2El.value === '') return;
+      const p2Val = Math.max(0, parseFloat(p2El.value) || 0);
+      const p1Val = Math.max(0, totalNeeded - p2Val);
+      document.getElementById('p1Mortgage').value = p1Val;
+      state.p1MortgageRatio = totalNeeded > 0 ? (p1Val / totalNeeded) : 0.5;
+      recalculateAll(false);
+    }
+
+    // Escuchar input, change y keyup para reacción inmediata
+    ['input', 'change', 'keyup'].forEach(evt => {
+      document.getElementById('p1Mortgage').addEventListener(evt, handleP1MortgageInput);
+      document.getElementById('p2Mortgage').addEventListener(evt, handleP2MortgageInput);
+    });
+
+    document.getElementById('p1Mortgage').addEventListener('blur', () => {
+      const el = document.getElementById('p1Mortgage');
+      if (el.value === '') {
+        el.value = 0;
+        handleP1MortgageInput();
+      }
+    });
+
+    document.getElementById('p2Mortgage').addEventListener('blur', () => {
+      const el = document.getElementById('p2Mortgage');
+      if (el.value === '') {
+        el.value = 0;
+        handleP2MortgageInput();
+      }
+    });
+
+    // Control deslizante de reparto interactivo
+    const splitSliderEl = document.getElementById('mortgageSplitSlider');
+    if (splitSliderEl) {
+      splitSliderEl.addEventListener('input', (e) => {
+        setMortgageSplit(parseInt(e.target.value) || 50);
+      });
+    }
+
+    // Función para fijar el reparto por porcentaje (accesos rápidos 50/50, 60/40, etc.)
+    function setMortgageSplit(p1Pct) {
+      const totalNeeded = state.autoMortgageTotal || 0;
+      const ratio = p1Pct / 100;
+      state.p1MortgageRatio = ratio;
+      const p1Calc = Math.round(totalNeeded * ratio);
+      const p2Calc = Math.max(0, totalNeeded - p1Calc);
+
+      document.getElementById('p1Mortgage').value = p1Calc;
+      document.getElementById('p2Mortgage').value = p2Calc;
+
+      const slider = document.getElementById('mortgageSplitSlider');
+      if (slider) {
+        slider.value = p1Pct;
+        const lbl1 = document.getElementById('sliderP1Pct');
+        const lbl2 = document.getElementById('sliderP2Pct');
+        if (lbl1) lbl1.innerText = `${p1Pct}%`;
+        if (lbl2) lbl2.innerText = `${100 - p1Pct}%`;
+      }
+
+      recalculateAll(false);
+    }
+
+    // Eventos específicos
+    document.getElementById('btnTypeNew').addEventListener('click', () => setHouseType('new'));
+    document.getElementById('btnTypeUsed').addEventListener('click', () => setHouseType('used'));
+
+    // Botón recalcular impuesto automático según precio actual
+    document.getElementById('btnResetTax').addEventListener('click', () => {
+      const price = parseFloat(document.getElementById('housePrice').value) || 0;
+      const rate = state.houseType === 'new' ? 0.10 : 0.06;
+      document.getElementById('taxAmount').value = Math.round(price * rate);
+      recalculateAll(true);
+      showToast('Impuesto recalculado al valor oficial por defecto.');
+    });
+
+    // Si cambia el precio, sugerir o recalcular proporcionalmente el impuesto
+    document.getElementById('housePrice').addEventListener('change', () => {
+      const price = parseFloat(document.getElementById('housePrice').value) || 0;
+      const rate = state.houseType === 'new' ? 0.10 : 0.06;
+      document.getElementById('taxAmount').value = Math.round(price * rate);
+      recalculateAll(true);
+    });
+
+    // Botón repartir hipoteca 50/50
+    document.getElementById('btnSplitMortgage5050').addEventListener('click', () => {
+      setMortgageSplit(50);
+      showToast('Hipoteca total dividida automáticamente 50% para cada uno.');
+    });
+
+    // =========================================================================
+    // PERSISTENCIA (LOCALSTORAGE) Y MODAL DE GUARDADO
+    // =========================================================================
+    function getSavedHouses() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        return raw ? JSON.parse(raw) : [];
+      } catch (e) {
+        console.error('Error al acceder a localStorage:', e);
+        return [];
+      }
+    }
+
+    function saveHousesList(list) {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
+        updateSavedCountBadge();
+      } catch (e) {
+        console.error('Error al guardar en localStorage:', e);
+      }
+    }
+
+    function updateSavedCountBadge() {
+      const list = getSavedHouses();
+      const badge = document.getElementById('savedCountBadge');
+      if (badge) badge.innerText = list.length;
+    }
+
+    // =========================================================================
+    // REPORTE RESUMEN EJECUTIVO & EXPORTACIÓN PDF
+    // =========================================================================
+    let lastSummaryData = null;
+
+    function renderSummaryReport(data) {
+      if (data) {
+        lastSummaryData = data;
+      } else {
+        data = lastSummaryData;
+      }
+      if (!data) return;
+
+      const d = data;
+      const el = (id) => document.getElementById(id);
+      const setTxt = (id, txt) => {
+        const node = el(id);
+        if (node) node.innerText = txt;
+      };
+
+      setTxt('sumRepHouseTitle', `Informe Financiero · Vivienda ${formatEUR(d.price)}`);
+      setTxt('sumRepDate', new Date().toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' }));
+      setTxt('sumRepTypeBadge', state.houseType === 'new' ? 'Obra Nueva (IVA 10%)' : 'Segunda Mano (ITP 6% + Reforma)');
+
+      // KPIs
+      setTxt('sumRepTotalCost', formatEUR(d.totalOperationCost));
+      setTxt('sumRepTotalDown', formatEUR(d.totalDownpayment));
+      setTxt('sumRepDownPct', `${formatPCT(d.downpaymentPct)} del coste total`);
+      setTxt('sumRepTotalMortgage', formatEUR(d.totalMortgage));
+      setTxt('sumRepMortgageLTV', `${formatPCT(d.mortgageLTV)} sobre precio (LTV)`);
+      setTxt('sumRepMonthly', `${formatEURDecimals(d.finTotal.monthlyPayment)} /mes`);
+      setTxt('sumRepLoanTerms', `TIN ${d.interestRate}% · ${d.mortgageYears} años`);
+      setTxt('sumRepEffort', formatPCT(d.totalEffortRatio));
+      
+      const effortStatusText = d.totalEffortRatio <= 30 ? 'Saludable (<30%)' : (d.totalEffortRatio <= 35 ? 'En el límite (30-35%)' : 'Riesgo alto (>35%)');
+      setTxt('sumRepEffortStatus', effortStatusText);
+      setTxt('sumRepOwnership', `${formatPCT(d.p1Ownership)} / ${formatPCT(d.p2Ownership)}`);
+
+      // 1. Costes
+      setTxt('sumRepPrice', formatEUR(d.price));
+      setTxt('sumRepTaxType', state.houseType === 'new' ? 'IVA 10%' : 'ITP 6%');
+      setTxt('sumRepTaxes', formatEUR(d.taxAmount));
+      setTxt('sumRepClosing', formatEUR(d.closingCosts));
+      setTxt('sumRepAgencyPct', `${d.agencyFeePercent}%`);
+      setTxt('sumRepAgency', formatEUR(d.agencyFeeAmount));
+      setTxt('sumRepRenovation', state.houseType === 'used' ? formatEUR(d.renovationCosts) : '0 € (Obra nueva)');
+      setTxt('sumRepCommunity', `${formatEUR(d.communityFee)}/mes (${formatEUR(d.communityAnnual)}/año)`);
+      setTxt('sumRepGrandTotal', formatEUR(d.totalOperationCost));
+
+      // 2. Fondos propios
+      const p1DownShare = d.totalDownpayment > 0 ? (d.p1InitialTotal / d.totalDownpayment) * 100 : 50;
+      const p2DownShare = d.totalDownpayment > 0 ? (d.p2InitialTotal / d.totalDownpayment) * 100 : 50;
+      setTxt('sumRepP1DownShare', `${formatPCT(p1DownShare)}`);
+      setTxt('sumRepP1Savings', formatEUR(d.p1Savings));
+      setTxt('sumRepP1Donations', formatEUR(d.p1Donations));
+      setTxt('sumRepP1DownTotal', formatEUR(d.p1InitialTotal));
+
+      setTxt('sumRepP2DownShare', `${formatPCT(p2DownShare)}`);
+      setTxt('sumRepP2Savings', formatEUR(d.p2Savings));
+      setTxt('sumRepP2Donations', formatEUR(d.p2Donations));
+      setTxt('sumRepP2DownTotal', formatEUR(d.p2InitialTotal));
+
+      // 3. Hipoteca y Cuotas
+      setTxt('sumRepP1Mortgage', formatEUR(d.p1Mortgage));
+      setTxt('sumRepP1Monthly', `${formatEURDecimals(d.finP1.monthlyPayment)} /m`);
+      setTxt('sumRepP2Mortgage', formatEUR(d.p2Mortgage));
+      setTxt('sumRepP2Monthly', `${formatEURDecimals(d.finP2.monthlyPayment)} /m`);
+      setTxt('sumRepTotalMortgageRow', formatEUR(d.totalMortgage));
+      setTxt('sumRepTotalMonthlyRow', `${formatEURDecimals(d.finTotal.monthlyPayment)} /m`);
+      setTxt('sumRepTotalMonthlyWithComm', `${formatEURDecimals(d.totalHousingMonthly)} /mes`);
+
+      // 4. Viabilidad
+      setTxt('sumRepP1Salary', `${formatEUR(d.p1Salary)}`);
+      setTxt('sumRepP1Effort', `${formatPCT(d.p1EffortRatio)}`);
+      setTxt('sumRepP1Free', `${formatEUR(d.p1FreeCash)} /m`);
+
+      setTxt('sumRepP2Salary', `${formatEUR(d.p2Salary)}`);
+      setTxt('sumRepP2Effort', `${formatPCT(d.p2EffortRatio)}`);
+      setTxt('sumRepP2Free', `${formatEUR(d.p2FreeCash)} /m`);
+
+      setTxt('sumRepTotalSalary', `${formatEUR(d.p1Salary + d.p2Salary)}`);
+      setTxt('sumRepEffortRow', `${formatPCT(d.totalEffortRatio)}`);
+      setTxt('sumRepTotalFree', `${formatEUR(d.totalFreeCash)} /m`);
+
+      // 5. Copropiedad
+      setTxt('sumRepTableP1Down', formatEUR(d.p1InitialTotal));
+      setTxt('sumRepTableP1Mortgage', formatEUR(d.p1Mortgage));
+      setTxt('sumRepTableP1Commit', formatEUR(d.p1TotalCommitment));
+      setTxt('sumRepTableP1Pct', formatPCT(d.p1Ownership));
+
+      setTxt('sumRepTableP2Down', formatEUR(d.p2InitialTotal));
+      setTxt('sumRepTableP2Mortgage', formatEUR(d.p2Mortgage));
+      setTxt('sumRepTableP2Commit', formatEUR(d.p2TotalCommitment));
+      setTxt('sumRepTableP2Pct', formatPCT(d.p2Ownership));
+
+      // 6. Intereses y Desembolso Real
+      setTxt('sumRepP1DownOutlay', formatEUR(d.p1InitialTotal));
+      setTxt('sumRepP1Interest', formatEUR(d.finP1.totalInterest));
+      setTxt('sumRepP1Repaid', formatEUR(d.finP1.totalRepaid));
+      setTxt('sumRepP1OutlayWithoutInterest', formatEUR(d.p1TotalCommitment));
+      setTxt('sumRepP1RealOutlay', formatEUR(d.p1RealOutlay));
+
+      setTxt('sumRepP2DownOutlay', formatEUR(d.p2InitialTotal));
+      setTxt('sumRepP2Interest', formatEUR(d.finP2.totalInterest));
+      setTxt('sumRepP2Repaid', formatEUR(d.finP2.totalRepaid));
+      setTxt('sumRepP2OutlayWithoutInterest', formatEUR(d.p2TotalCommitment));
+      setTxt('sumRepP2RealOutlay', formatEUR(d.p2RealOutlay));
+
+      setTxt('sumRepTotalDownOutlay', formatEUR(d.totalDownpayment));
+      setTxt('sumRepTotalInterest', formatEUR(d.finTotal.totalInterest));
+      setTxt('sumRepTotalRepaid', formatEUR(d.finTotal.totalRepaid));
+      setTxt('sumRepTotalOutlayWithoutInterest', formatEUR(d.totalOperationCost));
+      setTxt('sumRepGrandRealOutlay', formatEUR(d.totalRealOutlay));
+    }
+
+    // Modal Resumen y Descarga PDF
+    const summaryModal = document.getElementById('summaryModal');
+    const btnOpenSummaryModal = document.getElementById('btnOpenSummaryModal');
+    const btnOpenSummaryModalBottom = document.getElementById('btnOpenSummaryModalBottom');
+    const btnCloseSummaryModal = document.getElementById('btnCloseSummaryModal');
+    const btnCloseSummaryFooter = document.getElementById('btnCloseSummaryFooter');
+    const btnDownloadPdf = document.getElementById('btnDownloadPdf');
+    const btnDownloadPdfFooter = document.getElementById('btnDownloadPdfFooter');
+    const btnPrintSummary = document.getElementById('btnPrintSummary');
+
+    function openSummaryModal() {
+      renderSummaryReport();
+      summaryModal.classList.remove('hidden');
+    }
+
+    function closeSummaryModal() {
+      summaryModal.classList.add('hidden');
+    }
+
+    if (btnOpenSummaryModal) btnOpenSummaryModal.addEventListener('click', openSummaryModal);
+    if (btnOpenSummaryModalBottom) btnOpenSummaryModalBottom.addEventListener('click', openSummaryModal);
+    if (btnCloseSummaryModal) btnCloseSummaryModal.addEventListener('click', closeSummaryModal);
+    if (btnCloseSummaryFooter) btnCloseSummaryFooter.addEventListener('click', closeSummaryModal);
+
+    summaryModal.addEventListener('click', (e) => {
+      if (e.target === summaryModal) closeSummaryModal();
+    });
+
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        if (!summaryModal.classList.contains('hidden')) closeSummaryModal();
+        if (saveModal && !saveModal.classList.contains('hidden')) saveModal.classList.add('hidden');
+        if (compareModal && !compareModal.classList.contains('hidden')) compareModal.classList.add('hidden');
+      }
+    });
+
+    if (btnPrintSummary) {
+      btnPrintSummary.addEventListener('click', () => {
+        window.print();
+      });
+    }
+
+    function downloadSummaryPDF() {
+      const element = document.getElementById('summaryReportContent');
+      if (!element) return;
+
+      showToast('Generando y preparando PDF...');
+
+      const filename = `Resumen_CasaDos_${Math.round(state.price || 0)}_${new Date().toISOString().slice(0, 10)}.pdf`;
+
+      if (typeof html2pdf === 'function') {
+        const opt = {
+          margin: [8, 8, 8, 8],
+          filename: filename,
+          image: { type: 'jpeg', quality: 0.98 },
+          html2canvas: { scale: 2, useCORS: true, logging: false },
+          jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+          pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
+        };
+        html2pdf().set(opt).from(element).save().then(() => {
+          showToast('¡PDF descargado con éxito!');
+        }).catch(err => {
+          console.warn('html2pdf fallback to window.print:', err);
+          window.print();
+        });
+      } else {
+        window.print();
+      }
+    }
+
+    if (btnDownloadPdf) btnDownloadPdf.addEventListener('click', downloadSummaryPDF);
+    if (btnDownloadPdfFooter) btnDownloadPdfFooter.addEventListener('click', downloadSummaryPDF);
+
+    // Modal Guardar
+    const saveModal = document.getElementById('saveModal');
+    document.getElementById('btnOpenSaveModal').addEventListener('click', () => {
+      document.getElementById('saveHouseName').value = `Casa ${new Date().toLocaleDateString('es-ES', { day: 'numeric', month: 'short' })} (${formatEUR(state.price)})`;
+      document.getElementById('modalPreviewPrice').innerText = formatEUR(state.price);
+      document.getElementById('modalPreviewTotal').innerText = document.getElementById('sumTotalOperation').innerText;
+      document.getElementById('modalPreviewCuota').innerText = document.getElementById('totalMonthlyPaymentDetailed').innerText;
+      saveModal.classList.remove('hidden');
+      document.getElementById('saveHouseName').focus();
+    });
+
+    document.getElementById('btnCloseSaveModal').addEventListener('click', () => saveModal.classList.add('hidden'));
+    document.getElementById('btnCancelSave').addEventListener('click', () => saveModal.classList.add('hidden'));
+
+    document.getElementById('btnConfirmSave').addEventListener('click', () => {
+      const name = document.getElementById('saveHouseName').value.trim() || 'Vivienda sin nombre';
+      
+      const newSimulation = {
+        id: 'house_' + Date.now(),
+        date: new Date().toISOString(),
+        name: name,
+        state: { ...state }
+      };
+
+      const list = getSavedHouses();
+      list.push(newSimulation);
+      saveHousesList(list);
+
+      saveModal.classList.add('hidden');
+      showToast(`Simulación "${name}" guardada con éxito.`);
+    });
+
+    // =========================================================================
+    // COMPARADOR DE CASAS GUARDADAS (MODAL & TABLA)
+    // =========================================================================
+    const compareModal = document.getElementById('compareModal');
+
+    function openCompareModal() {
+      renderCompareTable();
+      compareModal.classList.remove('hidden');
+    }
+
+    function closeCompareModal() {
+      compareModal.classList.add('hidden');
+    }
+
+    document.getElementById('btnOpenCompareModal').addEventListener('click', openCompareModal);
+    document.getElementById('btnCloseCompareModal').addEventListener('click', closeCompareModal);
+    document.getElementById('btnCloseCompareFooter').addEventListener('click', closeCompareModal);
+
+    document.getElementById('btnClearAllSaved').addEventListener('click', () => {
+      if (confirm('¿Estás seguro de que quieres eliminar todas las casas guardadas?')) {
+        saveHousesList([]);
+        renderCompareTable();
+        showToast('Todas las simulaciones han sido borradas.');
+      }
+    });
+
+    function deleteHouse(id) {
+      let list = getSavedHouses();
+      list = list.filter(h => h.id !== id);
+      saveHousesList(list);
+      renderCompareTable();
+      showToast('Simulación eliminada.');
+    }
+
+    function loadHouseSimulation(id) {
+      const list = getSavedHouses();
+      const house = list.find(h => h.id === id);
+      if (!house || !house.state) return;
+      const s = house.state;
+
+      // 1. Establecer el tipo de vivienda primero (sin recalcular valores por defecto ni sincronizar hipoteca)
+      setHouseType(s.houseType, false, false);
+
+      // 2. Cargar en inputs todos los datos de la vivienda y gastos
+      document.getElementById('housePrice').value = s.price;
+      document.getElementById('taxAmount').value = s.taxAmount;
+      document.getElementById('renovationCosts').value = s.renovationCosts;
+      document.getElementById('closingCosts').value = s.closingCosts;
+      document.getElementById('agencyFeePercent').value = s.agencyFeePercent;
+      document.getElementById('communityFee').value = s.communityFee || 0;
+      
+      // 3. Cargar aportaciones iniciales
+      document.getElementById('p1Savings').value = s.p1Savings;
+      document.getElementById('p1Donations').value = s.p1Donations;
+      document.getElementById('p2Savings').value = s.p2Savings;
+      document.getElementById('p2Donations').value = s.p2Donations;
+
+      // 4. Cargar condiciones financieras e hipoteca guardada para cada persona
+      document.getElementById('interestRate').value = s.interestRate;
+      document.getElementById('mortgageYears').value = s.mortgageYears;
+      document.getElementById('p1Mortgage').value = s.p1Mortgage;
+      document.getElementById('p2Mortgage').value = s.p2Mortgage;
+
+      // 5. Cargar salarios y gastos
+      document.getElementById('p1Salary').value = s.p1Salary;
+      document.getElementById('p1LivingCosts').value = s.p1LivingCosts;
+      document.getElementById('p2Salary').value = s.p2Salary;
+      document.getElementById('p2LivingCosts').value = s.p2LivingCosts;
+
+      // 6. Cargar nombres
+      const p1NameVal = s.p1Name || 'Persona 1';
+      const p2NameVal = s.p2Name || 'Persona 2';
+      const p1Input = document.getElementById('p1Name');
+      const p2Input = document.getElementById('p2Name');
+      if (p1Input) p1Input.value = p1NameVal;
+      if (p2Input) p2Input.value = p2NameVal;
+      state.p1Name = p1NameVal;
+      state.p2Name = p2NameVal;
+
+      // 7. Fijar ratio y recalcular SIN sobrescribir los importes de hipoteca cargados
+      state.p1MortgageRatio = (s.p1Mortgage + s.p2Mortgage > 0) ? (s.p1Mortgage / (s.p1Mortgage + s.p2Mortgage)) : 0.5;
+      recalculateAll(false);
+
+      closeCompareModal();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      showToast(`Simulación "${house.name}" cargada en la calculadora.`);
+    }
+
+    function renderCompareTable() {
+      const container = document.getElementById('compareContentContainer');
+      const list = getSavedHouses();
+      updateSavedCountBadge();
+
+      if (list.length === 0) {
+        container.innerHTML = `
+          <div class="h-full flex flex-col items-center justify-center text-center p-12 text-slate-400 space-y-3">
+            <div class="w-16 h-16 rounded-full bg-slate-100 flex items-center justify-center text-slate-300">
+              <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+              </svg>
+            </div>
+            <h4 class="text-base font-bold text-slate-700">No hay casas guardadas todavía</h4>
+            <p class="text-xs max-w-sm text-slate-500">
+              Configura los valores de la vivienda que estés viendo y haz clic en <strong>"Guardar simulación"</strong> para añadirla a este comparador.
+            </p>
+          </div>
+        `;
+        return;
+      }
+
+      // Preparar métricas calculadas para cada casa
+      const housesData = list.map(item => {
+        const s = item.state;
+        const agencyFee = (s.price * s.agencyFeePercent) / 100;
+        const totalCost = s.price + s.taxAmount + s.closingCosts + agencyFee + (s.houseType === 'used' ? s.renovationCosts : 0);
+        const totalDown = (s.p1Savings + s.p1Donations) + (s.p2Savings + s.p2Donations);
+        const totalMortgage = s.p1Mortgage + s.p2Mortgage;
+        
+        const communityFee = s.communityFee || 0;
+        const communityAnnual = communityFee * 12;
+        const communityTotalYears = communityFee * 12 * s.mortgageYears;
+
+        const finP1 = calculateMortgage(s.p1Mortgage, s.interestRate, s.mortgageYears);
+        const finP2 = calculateMortgage(s.p2Mortgage, s.interestRate, s.mortgageYears);
+        const finTotal = calculateMortgage(totalMortgage, s.interestRate, s.mortgageYears);
+
+        const monthlyHousingTotal = finTotal.monthlyPayment + communityFee;
+        const p1HousingMonthly = finP1.monthlyPayment + (communityFee / 2);
+        const p2HousingMonthly = finP2.monthlyPayment + (communityFee / 2);
+        const grandRealOutlayWithCommunity = totalCost + finTotal.totalInterest + communityTotalYears;
+
+        const p1Effort = s.p1Salary > 0 ? (finP1.monthlyPayment / s.p1Salary) * 100 : 0;
+        const p2Effort = s.p2Salary > 0 ? (finP2.monthlyPayment / s.p2Salary) * 100 : 0;
+        const totalEffort = (s.p1Salary + s.p2Salary) > 0 ? (finTotal.monthlyPayment / (s.p1Salary + s.p2Salary)) * 100 : 0;
+
+        const p1Free = s.p1Salary - finP1.monthlyPayment - s.p1LivingCosts - (communityFee / 2);
+        const p2Free = s.p2Salary - finP2.monthlyPayment - s.p2LivingCosts - (communityFee / 2);
+        const totalFree = p1Free + p2Free;
+
+        const p1TotalCommit = s.p1Savings + s.p1Donations + s.p1Mortgage;
+        const p2TotalCommit = s.p2Savings + s.p2Donations + s.p2Mortgage;
+        const grandCommit = p1TotalCommit + p2TotalCommit;
+        const p1Own = grandCommit > 0 ? (p1TotalCommit / grandCommit) * 100 : 50;
+        const p2Own = grandCommit > 0 ? (p2TotalCommit / grandCommit) * 100 : 50;
+
+        const p1Name = s.p1Name || 'Persona 1';
+        const p2Name = s.p2Name || 'Persona 2';
+
+        return {
+          id: item.id,
+          name: item.name,
+          date: new Date(item.date).toLocaleDateString('es-ES'),
+          s,
+          p1Name,
+          p2Name,
+          totalCost,
+          totalDown,
+          totalMortgage,
+          communityFee,
+          communityAnnual,
+          communityTotalYears,
+          monthlyHousingTotal,
+          p1HousingMonthly,
+          p2HousingMonthly,
+          grandRealOutlayWithCommunity,
+          finTotal,
+          finP1,
+          finP2,
+          p1Effort,
+          p2Effort,
+          totalEffort,
+          p1Free,
+          p2Free,
+          totalFree,
+          p1Own,
+          p2Own
+        };
+      });
+
+      // Construcción de la tabla comparativa lado a lado
+      let html = `
+        <table class="w-full text-left text-xs border-collapse">
+          <thead>
+            <tr class="bg-slate-100/80 sticky top-0 z-10 border-b border-slate-200">
+              <th class="p-3 text-slate-500 font-bold uppercase tracking-wider min-w-[200px]">Característica</th>
+              ${housesData.map(h => `
+                <th class="p-3 min-w-[220px]">
+                  <div class="flex items-center justify-between">
+                    <span class="font-extrabold text-slate-900 text-sm">${h.name}</span>
+                    <button onclick="deleteHouse('${h.id}')" class="text-rose-400 hover:text-rose-600 p-1 rounded" title="Eliminar">&times;</button>
+                  </div>
+                  <span class="text-[11px] text-slate-400 block font-normal">${h.date} • ${h.s.houseType === 'new' ? 'Obra Nueva' : 'Seminueva'}</span>
+                  <button onclick="loadHouseSimulation('${h.id}')" class="mt-2 w-full py-1 text-xs font-semibold rounded bg-indigo-50 text-indigo-700 hover:bg-indigo-100 border border-indigo-200">
+                    Cargar en calculadora
+                  </button>
+                </th>
+              `).join('')}
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-100">
+            <!-- Precio Base -->
+            <tr class="hover:bg-slate-50">
+              <td class="p-3 font-semibold text-slate-700">Precio Vivienda (sin IVA)</td>
+              ${housesData.map(h => `<td class="p-3 font-bold text-slate-900">${formatEUR(h.s.price)}</td>`).join('')}
+            </tr>
+
+            <!-- Impuestos & Gastos -->
+            <tr class="hover:bg-slate-50">
+              <td class="p-3 text-slate-600">Impuestos (IVA/ITP) + Gastos</td>
+              ${housesData.map(h => `<td class="p-3 text-slate-700">${formatEUR(h.s.taxAmount + h.s.closingCosts + ((h.s.price * h.s.agencyFeePercent)/100))}</td>`).join('')}
+            </tr>
+
+            <!-- Reforma -->
+            <tr class="hover:bg-slate-50">
+              <td class="p-3 text-slate-600">Reforma Estimada</td>
+              ${housesData.map(h => `<td class="p-3 text-slate-700">${h.s.houseType === 'used' ? formatEUR(h.s.renovationCosts) : '<span class="text-slate-400">0 € (Nueva)</span>'}</td>`).join('')}
+            </tr>
+
+            <!-- Gastos de Comunidad Mensual -->
+            <tr class="hover:bg-slate-50">
+              <td class="p-3 text-slate-600">Gastos de Comunidad Mensuales</td>
+              ${housesData.map(h => `<td class="p-3 font-semibold text-amber-700">${h.communityFee > 0 ? `${formatEUR(h.communityFee)} /mes` : '<span class="text-slate-400">0 € (Sin comunidad)</span>'}</td>`).join('')}
+            </tr>
+
+            <!-- Total Comunidad Acumulada -->
+            <tr class="hover:bg-slate-50 text-[11px] text-slate-500">
+              <td class="p-3 pl-6">↳ Comunidad Acumulada (${housesData[0] ? housesData[0].s.mortgageYears : 30} años)</td>
+              ${housesData.map(h => `<td class="p-3 text-slate-600">${formatEUR(h.communityTotalYears)}</td>`).join('')}
+            </tr>
+
+            <!-- COSTE TOTAL DE ADQUISICIÓN -->
+            <tr class="bg-indigo-50/40 font-bold hover:bg-indigo-50/70">
+              <td class="p-3 text-indigo-900 font-extrabold">COSTE TOTAL OPERACIÓN (Compra)</td>
+              ${housesData.map(h => `<td class="p-3 text-indigo-900 text-sm font-black">${formatEUR(h.totalCost)}</td>`).join('')}
+            </tr>
+
+            <!-- Entrada Aportada Pareja -->
+            <tr class="hover:bg-slate-50">
+              <td class="p-3 text-slate-600">Entrada Total Aportada</td>
+              ${housesData.map(h => `<td class="p-3 text-emerald-700 font-bold">${formatEUR(h.totalDown)}</td>`).join('')}
+            </tr>
+
+            <!-- Hipoteca Total -->
+            <tr class="hover:bg-slate-50">
+              <td class="p-3 text-slate-600">Hipoteca Total Necesaria</td>
+              ${housesData.map(h => `<td class="p-3 text-sky-700 font-bold">${formatEUR(h.totalMortgage)}</td>`).join('')}
+            </tr>
+
+            <!-- Hipoteca P1 / P2 -->
+            <tr class="hover:bg-slate-50 text-[11px] text-slate-500">
+              <td class="p-3 pl-6">↳ Reparto Hipoteca</td>
+              ${housesData.map(h => `<td class="p-3"><span class="font-medium text-slate-700">${h.p1Name}:</span> ${formatEUR(h.s.p1Mortgage)}<br><span class="font-medium text-slate-700">${h.p2Name}:</span> ${formatEUR(h.s.p2Mortgage)}</td>`).join('')}
+            </tr>
+
+            <!-- Interés y Plazo -->
+            <tr class="hover:bg-slate-50 text-[11px] text-slate-500">
+              <td class="p-3">Condiciones Préstamo</td>
+              ${housesData.map(h => `<td class="p-3">${h.s.interestRate}% TIN a ${h.s.mortgageYears} años</td>`).join('')}
+            </tr>
+
+            <!-- Intereses Préstamo -->
+            <tr class="hover:bg-amber-50/40 text-[11px]">
+              <td class="p-3 text-amber-800 font-semibold">Total Intereses Préstamo</td>
+              ${housesData.map(h => `<td class="p-3 font-bold text-amber-700">${formatEUR(h.finTotal.totalInterest)}</td>`).join('')}
+            </tr>
+
+            <!-- Desembolso Compra + Intereses -->
+            <tr class="hover:bg-slate-50 text-[11px]">
+              <td class="p-3 text-slate-600">Coste Adquisición + Intereses</td>
+              ${housesData.map(h => `<td class="p-3 font-semibold text-slate-800">${formatEUR(h.totalCost + h.finTotal.totalInterest)}</td>`).join('')}
+            </tr>
+
+            <!-- DESEMBOLSO REAL GLOBAL (CON COMUNIDAD) -->
+            <tr class="bg-indigo-50/60 hover:bg-indigo-100/60 text-xs">
+              <td class="p-3 text-indigo-950 font-black">DESEMBOLSO REAL GLOBAL (+ Comunidad)</td>
+              ${housesData.map(h => `<td class="p-3 font-black text-indigo-950 text-sm">${formatEUR(h.grandRealOutlayWithCommunity)}</td>`).join('')}
+            </tr>
+
+            <!-- CUOTA MENSUAL HIPOTECA -->
+            <tr class="hover:bg-slate-50">
+              <td class="p-3 text-slate-700 font-semibold">Cuota Préstamo Hipotecario</td>
+              ${housesData.map(h => `<td class="p-3 text-slate-900 font-bold">${formatEURDecimals(h.finTotal.monthlyPayment)} /m</td>`).join('')}
+            </tr>
+
+            <!-- GASTO MENSUAL TOTAL (CUOTA + COMUNIDAD) -->
+            <tr class="bg-slate-900 text-white font-bold">
+              <td class="p-3 font-extrabold text-amber-300">GASTO MENSUAL TOTAL (Cuota + Comunidad)</td>
+              ${housesData.map(h => `<td class="p-3 text-amber-300 text-sm font-black">${formatEURDecimals(h.monthlyHousingTotal)} /m</td>`).join('')}
+            </tr>
+
+            <!-- Gasto Mensual Fijo P1 / P2 -->
+            <tr class="hover:bg-slate-50 text-[11px]">
+              <td class="p-3 pl-6 text-slate-500">↳ Gasto Mensual Individual</td>
+              ${housesData.map(h => `<td class="p-3 font-semibold text-slate-800"><span class="text-slate-500">${h.p1Name}:</span> ${formatEURDecimals(h.p1HousingMonthly)}<br><span class="text-slate-500">${h.p2Name}:</span> ${formatEURDecimals(h.p2HousingMonthly)}</td>`).join('')}
+            </tr>
+
+            <!-- Tasa Esfuerzo Conjunta -->
+            <tr class="hover:bg-slate-50">
+              <td class="p-3 text-slate-600">Esfuerzo Conjunto</td>
+              ${housesData.map(h => {
+                let badgeClass = h.totalEffort <= 30 ? 'text-emerald-700 bg-emerald-100' : (h.totalEffort <= 35 ? 'text-amber-700 bg-amber-100' : 'text-rose-700 bg-rose-100');
+                return `<td class="p-3"><span class="px-2 py-0.5 rounded font-bold ${badgeClass}">${formatPCT(h.totalEffort)}</span></td>`;
+              }).join('')}
+            </tr>
+
+            <!-- Esfuerzo P1 / P2 -->
+            <tr class="hover:bg-slate-50 text-[11px]">
+              <td class="p-3 pl-6 text-slate-500">↳ Esfuerzo Individual</td>
+              ${housesData.map(h => `<td class="p-3 text-slate-600"><span class="text-slate-500">${h.p1Name}:</span> ${formatPCT(h.p1Effort)}<br><span class="text-slate-500">${h.p2Name}:</span> ${formatPCT(h.p2Effort)}</td>`).join('')}
+            </tr>
+
+            <!-- Dinero Libre Mensual Total -->
+            <tr class="hover:bg-slate-50">
+              <td class="p-3 text-slate-600 font-bold">Dinero Libre Mensual Pareja</td>
+              ${housesData.map(h => `<td class="p-3 font-black ${h.totalFree >= 0 ? 'text-emerald-700' : 'text-rose-600'}">${formatEUR(h.totalFree)} /m</td>`).join('')}
+            </tr>
+
+            <!-- Dinero Libre P1 / P2 -->
+            <tr class="hover:bg-slate-50 text-[11px] text-slate-500">
+              <td class="p-3 pl-6">↳ Dinero Libre Individual</td>
+              ${housesData.map(h => `<td class="p-3"><span class="text-slate-500">${h.p1Name}:</span> ${formatEUR(h.p1Free)}<br><span class="text-slate-500">${h.p2Name}:</span> ${formatEUR(h.p2Free)}</td>`).join('')}
+            </tr>
+
+            <!-- Porcentaje de Propiedad Notarial -->
+            <tr class="bg-purple-50/50 hover:bg-purple-50">
+              <td class="p-3 font-bold text-purple-900">% Propiedad Legal</td>
+              ${housesData.map(h => `
+                <td class="p-3 font-bold">
+                  <div><span class="text-blue-700 font-extrabold">${h.p1Name}: ${formatPCT(h.p1Own)}</span></div>
+                  <div><span class="text-fuchsia-700 font-extrabold">${h.p2Name}: ${formatPCT(h.p2Own)}</span></div>
+                </td>
+              `).join('')}
+            </tr>
+          </tbody>
+        </table>
+      `;
+
+      container.innerHTML = html;
+    }
+
+    // =========================================================================
+    // INICIALIZACIÓN
+    // =========================================================================
+    function initApp() {
+      // Estado inicial por defecto: Seminueva con reforma de 50.000 € y 6% ITP
+      setHouseType('used', false);
+      updateSavedCountBadge();
+      recalculateAll(true);
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initApp);
+    } else {
+      initApp();
+    }
+  </script>
+</body>
+</html>
